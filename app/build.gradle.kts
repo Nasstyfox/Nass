@@ -75,4 +75,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 }
