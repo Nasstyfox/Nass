@@ -1,12 +1,12 @@
 package com.example.nass.data.remote
 
-import com.example.nass.data.local.TokenManager
+import com.example.nass.data.local.SessionManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
+class AuthInterceptor(private val session: SessionManager) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
@@ -18,7 +18,7 @@ class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
         if (isPublic) return chain.proceed(request)
 
         // Read token from DataStore (blocking is acceptable in an Interceptor)
-        val token = runBlocking { tokenManager.tokenFlow.first() }
+        val token = runBlocking { session.tokenFlow.first() }
 
         return if (!token.isNullOrBlank()) {
             val newRequest = request.newBuilder()

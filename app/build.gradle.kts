@@ -37,6 +37,10 @@ android {
     buildFeatures {
         compose = true
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -77,4 +81,7 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
 
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.mockwebserver)
 }

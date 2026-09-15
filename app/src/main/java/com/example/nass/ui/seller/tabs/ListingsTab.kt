@@ -26,6 +26,7 @@ import com.example.nass.data.model.Product
 import com.example.nass.ui.seller.SellerViewModel
 import com.example.nass.util.Resource
 import java.util.Locale
+import com.example.nass.util.Formatters
 
 private enum class ListingFilter(val label: String) {
     ALL("All"),
@@ -259,7 +260,8 @@ private fun ListingCard(product: Product, onClick: () -> Unit) {
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    text = String.format(Locale.US, "R %.2f", product.price),
+                    //text = String.format(Locale.US, "R %.2f", product.price),
+                    text =Formatters.price(product.price),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary

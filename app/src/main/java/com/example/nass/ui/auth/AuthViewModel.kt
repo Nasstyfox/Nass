@@ -14,11 +14,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
+import com.example.nass.data.local.SessionManager
 data class AuthUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val loginSuccessRole: String? = null,     // set to "seller"/"buyer"/"admin" after login
+    val loginSuccessRole: String? = null,
     val registerSuccess: Boolean = false,
     val registerMessage: String? = null
 )
@@ -33,23 +33,17 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
             _state.value = _state.value.copy(errorMessage = "Please enter username and password")
             return
         }
-
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, errorMessage = null)
-
             when (val result = repo.login(username.trim(), password)) {
-                is Resource.Success -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        loginSuccessRole = result.data.user.role
-                    )
-                }
-                is Resource.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = result.message
-                    )
-                }
+                is Resource.Success -> _state.value = _state.value.copy(
+                    isLoading = false,
+                    loginSuccessRole = result.data.user.role
+                )
+                is Resource.Error -> _state.value = _state.value.copy(
+                    isLoading = false,
+                    errorMessage = result.message
+                )
                 else -> Unit
             }
         }
@@ -64,25 +58,19 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
             _state.value = _state.value.copy(errorMessage = "Passwords do not match")
             return
         }
-
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, errorMessage = null)
-
             val req = RegisterRequest(username.trim(), email.trim(), password, confirmPassword, role)
             when (val result = repo.register(req)) {
-                is Resource.Success -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        registerSuccess = true,
-                        registerMessage = result.data.message
-                    )
-                }
-                is Resource.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = result.message
-                    )
-                }
+                is Resource.Success -> _state.value = _state.value.copy(
+                    isLoading = false,
+                    registerSuccess = true,
+                    registerMessage = result.data.message
+                )
+                is Resource.Error -> _state.value = _state.value.copy(
+                    isLoading = false,
+                    errorMessage = result.message
+                )
                 else -> Unit
             }
         }
@@ -99,13 +87,12 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
     fun clearError() {
         _state.value = _state.value.copy(errorMessage = null)
     }
-
     companion object {
         fun factory(context: Context) = viewModelFactory {
             initializer {
                 val api = RetrofitClient.getInstance(context)
-                val tokenManager = TokenManager(context.applicationContext)
-                AuthViewModel(AuthRepository(api, tokenManager))
+                val session = TokenManager(context.applicationContext)
+                AuthViewModel(AuthRepository(api = api, session = session))
             }
         }
     }

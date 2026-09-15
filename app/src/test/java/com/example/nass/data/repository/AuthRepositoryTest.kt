@@ -15,7 +15,7 @@ class AuthRepository(
     private val tag = "AuthRepo"
 
     suspend fun login(username: String, password: String): Resource<LoginResponse> {
-        Logger.i(tag, "login() -> username=$username")
+        Logger.i(tag, "login() → username=$username")
         return try {
             val response = api.login(LoginRequest(username, password))
             if (response.isSuccessful && response.body() != null) {
@@ -27,11 +27,11 @@ class AuthRepository(
                     email = body.user.email,
                     role = body.user.role
                 )
-                Logger.i(tag, "login success -> role=${body.user.role}")
+                Logger.i(tag, "login success → role=${body.user.role}")
                 Resource.Success(body)
             } else {
                 val msg = parseError(response.errorBody()?.string(), response.code())
-                Logger.w(tag, "login failed -> $msg")
+                Logger.w(tag, "login failed → $msg")
                 Resource.Error(msg, response.code())
             }
         } catch (e: Exception) {
@@ -41,15 +41,15 @@ class AuthRepository(
     }
 
     suspend fun register(req: RegisterRequest): Resource<RegisterResponse> {
-        Logger.i(tag, "register() -> username=${req.username} role=${req.role}")
+        Logger.i(tag, "register() → username=${req.username} role=${req.role}")
         return try {
             val response = api.register(req)
             if (response.isSuccessful && response.body() != null) {
-                Logger.i(tag, "register success -> userId=${response.body()!!.userId}")
+                Logger.i(tag, "register success → userId=${response.body()!!.userId}")
                 Resource.Success(response.body()!!)
             } else {
                 val msg = parseError(response.errorBody()?.string(), response.code())
-                Logger.w(tag, "register failed -> $msg")
+                Logger.w(tag, "register failed → $msg")
                 Resource.Error(msg, response.code())
             }
         } catch (e: Exception) {
@@ -59,7 +59,7 @@ class AuthRepository(
     }
 
     suspend fun logout() {
-        Logger.i(tag, "logout() - clearing session")
+        Logger.i(tag, "logout() — clearing DataStore")
         session.clearSession()
     }
 

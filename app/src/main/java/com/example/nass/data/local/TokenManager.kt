@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore(name = Constants.PREFS_NAME)
 
-class TokenManager(private val context: Context) {
+class TokenManager(private val context: Context) : SessionManager {
 
     private val tokenKey = stringPreferencesKey(Constants.KEY_TOKEN)
     private val userIdKey = intPreferencesKey(Constants.KEY_USER_ID)
@@ -19,10 +19,10 @@ class TokenManager(private val context: Context) {
     private val emailKey = stringPreferencesKey(Constants.KEY_EMAIL)
     private val roleKey = stringPreferencesKey(Constants.KEY_ROLE)
 
-    val tokenFlow: Flow<String?> = context.dataStore.data.map { it[tokenKey] }
-    val roleFlow: Flow<String?> = context.dataStore.data.map { it[roleKey] }
+    override val tokenFlow: Flow<String?> = context.dataStore.data.map { it[tokenKey] }
+    override val roleFlow: Flow<String?> = context.dataStore.data.map { it[roleKey] }
 
-    suspend fun saveSession(
+    override suspend fun saveSession(
         token: String,
         userId: Int,
         username: String,
@@ -38,7 +38,7 @@ class TokenManager(private val context: Context) {
         }
     }
 
-    suspend fun clearSession() {
+    override suspend fun clearSession() {
         context.dataStore.edit { it.clear() }
     }
 }

@@ -18,6 +18,15 @@ import com.example.nass.ui.seller.tabs.ListingsTab
 import com.example.nass.ui.seller.tabs.StatsTab
 import kotlinx.coroutines.launch
 
+/**
+ * Seller dashboard shell.
+ *
+ * Bottom-nav tabs map to the seller's main workflows:
+ *  - Stats     → live counts of added / sold / available
+ *  - Listings  → all products with filter chips + tap to edit
+ *  - Add       → form for creating a new listing
+ *  - Profile   → placeholder, built last
+ */
 private enum class SellerTab(val label: String) {
     STATS("Stats"),
     LISTINGS("Listings"),
