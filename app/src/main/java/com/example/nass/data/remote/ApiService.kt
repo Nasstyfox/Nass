@@ -53,4 +53,26 @@ interface ApiService {
     // ============ TRANSACTION HISTORY ============
     @GET("api/v1/transactions/history")
     suspend fun getTransactionHistory(): Response<List<TransactionSummary>>
+
+    // ============ ADMIN ============
+    @GET("api/v1/admin/users")
+    suspend fun getAllUsers(): Response<List<AdminUser>>
+
+    @PUT("api/v1/admin/users/{id}/verify")
+    suspend fun verifyUser(@Path("id") id: Int): Response<MessageResponse>
+
+    @PUT("api/v1/admin/users/{id}")
+    suspend fun updateUser(
+        @Path("id") id: Int,
+        @Body body: UpdateUserRequest
+    ): Response<AdminUser>
+
+    @DELETE("api/v1/admin/users/{id}")
+    suspend fun deleteUser(@Path("id") id: Int): Response<Unit>
+
+    @PUT("api/v1/admin/users/{id}/reset-password")
+    suspend fun resetPassword(
+        @Path("id") id: Int,
+        @Body body: ResetPasswordRequest
+    ): Response<MessageResponse>
 }
