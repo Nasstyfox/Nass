@@ -11,18 +11,23 @@ class ProductRepository(private val api: ApiService) {
 
     private val tag = "ProductRepo"
 
+    suspend fun getAvailable(): Resource<List<Product>> {
+        Logger.d(tag, "getAvailable()")
+        return safeCall("getAvailable") { api.getAvailableProducts() }
+    }
+
     suspend fun create(req: CreateProductRequest): Resource<Product> {
-        Logger.i(tag, "create() → name=${req.name} price=${req.price}")
+        Logger.i(tag, "create() -> name=${req.name} price=${req.price}")
         return safeCall("create") { api.createProduct(req) }
     }
 
     suspend fun update(id: Int, req: CreateProductRequest): Resource<Product> {
-        Logger.i(tag, "update() → id=$id name=${req.name}")
+        Logger.i(tag, "update() -> id=$id name=${req.name}")
         return safeCall("update") { api.updateProduct(id, req) }
     }
 
     suspend fun delete(id: Int): Resource<Unit> {
-        Logger.i(tag, "delete() → id=$id")
+        Logger.i(tag, "delete() -> id=$id")
         return try {
             val response = api.deleteProduct(id)
             if (response.isSuccessful) {

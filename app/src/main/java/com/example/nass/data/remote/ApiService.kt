@@ -35,4 +35,22 @@ interface ApiService {
 
     @DELETE("api/v1/products/{id}")
     suspend fun deleteProduct(@Path("id") id: Int): Response<Unit>
+
+    // ============ BUYER / CART ============
+    @GET("api/v1/cart")
+    suspend fun getCart(): Response<List<CartItem>>
+
+    @POST("api/v1/cart")
+    suspend fun addToCart(@Body body: AddToCartRequest): Response<AddToCartResponse>
+
+    @DELETE("api/v1/cart/{id}")
+    suspend fun removeFromCart(@Path("id") cartItemId: Int): Response<Unit>
+
+    // ============ CHECKOUT ============
+    @POST("api/v1/checkout")
+    suspend fun checkout(): Response<CheckoutResponse>
+
+    // ============ TRANSACTION HISTORY ============
+    @GET("api/v1/transactions/history")
+    suspend fun getTransactionHistory(): Response<List<TransactionSummary>>
 }

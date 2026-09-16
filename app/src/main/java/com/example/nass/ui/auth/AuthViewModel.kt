@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.example.nass.data.local.SessionManager
+
 data class AuthUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
