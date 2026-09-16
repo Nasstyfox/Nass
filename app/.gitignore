@@ -1,1 +1,8 @@
 /build
+
+# Signing
+*.jks
+*.keystore
+
+# Local secrets
+local.properties

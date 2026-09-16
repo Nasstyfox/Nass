@@ -2,7 +2,7 @@ package com.example.nass.util
 
 object Constants {
     // Ngrok dev URL — swap for production Render/Railway URL before final demo
-    const val BASE_URL = "https://upwind-defrost-jab.ngrok-free.dev/"
+    const val BASE_URL = "https://upwind-defrost-jab.ngrok-free.dev"
 
     // API path prefixes
     const val API_PREFIX = "api/v1/"
