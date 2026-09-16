@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nass.ui.admin.tabs.UsersTab
+import com.example.nass.ui.common.SettingsScreen
 import kotlinx.coroutines.launch
 
 private enum class AdminTab(val label: String) {
@@ -71,14 +72,19 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
         ) {
             when (currentTab) {
                 AdminTab.USERS -> UsersTab(vm = vm, onUserClick = { vm.selectUser(it) })
-                AdminTab.PROFILE -> {
+                /*AdminTab.PROFILE -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("Profile will be built near the end")
                     }
-                }
+                }*/
+
+                AdminTab.PROFILE -> SettingsScreen(
+                    onLogout = onLogout,
+                    onMessage = { msg -> scope.launch { snackbarHostState.showSnackbar(msg) } }
+                )
             }
         }
     }

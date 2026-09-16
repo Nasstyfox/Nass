@@ -13,6 +13,15 @@ interface ApiService {
     @POST("api/v1/auth/register")
     suspend fun register(@Body body: RegisterRequest): Response<RegisterResponse>
 
+    @GET("api/v1/auth/me")
+    suspend fun getProfile(): Response<GetProfileResponse>
+
+    @PUT("api/v1/auth/me")
+    suspend fun updateProfile(@Body body: UpdateProfileRequest): Response<UpdateProfileResponse>
+
+    @PUT("api/v1/auth/me/password")
+    suspend fun updatePassword(@Body body: ChangePasswordRequest): Response<MessageResponse>
+
     // ============ SELLER ============
     @GET("api/v1/seller/stats")
     suspend fun getSellerStats(): Response<SellerStats>

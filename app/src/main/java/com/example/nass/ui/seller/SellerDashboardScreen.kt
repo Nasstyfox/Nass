@@ -17,6 +17,7 @@ import com.example.nass.ui.seller.tabs.EditProductSheet
 import com.example.nass.ui.seller.tabs.ListingsTab
 import com.example.nass.ui.seller.tabs.StatsTab
 import kotlinx.coroutines.launch
+import com.example.nass.ui.common.SettingsScreen
 
 /**
  * Seller dashboard shell.
@@ -104,7 +105,11 @@ fun SellerDashboardScreen(onLogout: () -> Unit) {
                     vm = vm,
                     onProductAdded = { currentTab = SellerTab.LISTINGS }
                 )
-                SellerTab.PROFILE -> PlaceholderTab("Profile will be built near the end")
+                //SellerTab.PROFILE -> PlaceholderTab("Profile will be built near the end")
+                SellerTab.PROFILE -> SettingsScreen(
+                    onLogout = onLogout,
+                    onMessage = { msg -> scope.launch { snackbarHostState.showSnackbar(msg) } }
+                )
             }
         }
     }

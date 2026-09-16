@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nass.ui.buyer.tabs.BrowseTab
 import com.example.nass.ui.buyer.tabs.CartTab
 import com.example.nass.ui.buyer.tabs.HistoryTab
+import com.example.nass.ui.common.SettingsScreen
 import com.example.nass.util.Resource
 import kotlinx.coroutines.launch
 
@@ -105,7 +106,11 @@ fun BuyerDashboardScreen(onLogout: () -> Unit) {
                     vm = vm,
                     onGoToBrowse = { currentTab = BuyerTab.BROWSE }
                 )
-                BuyerTab.PROFILE -> PlaceholderTab("Profile will be built near the end")
+                //BuyerTab.PROFILE -> PlaceholderTab("Profile will be built near the end")
+                BuyerTab.PROFILE -> SettingsScreen(
+                    onLogout = onLogout,
+                    onMessage = { msg -> scope.launch { snackbarHostState.showSnackbar(msg) } }
+                )
             }
         }
     }
