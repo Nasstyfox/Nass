@@ -16,10 +16,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import android.net.Uri
+import com.example.nass.data.repository.ImageRepository
 
 class SellerViewModel(
     private val sellerRepo: SellerRepository,
-    private val productRepo: ProductRepository
+    private val productRepo: ProductRepository,
+    private val imageRepo: ImageRepository
 ) : ViewModel() {
 
     private val _stats = MutableStateFlow<Resource<SellerStats>>(Resource.Idle)
@@ -32,6 +35,10 @@ class SellerViewModel(
     val createState: StateFlow<Resource<Product>> = _createState.asStateFlow()
 
     // ---- edit/delete state ----
+
+    private val _imageUpload = MutableStateFlow<Resource<String>>(Resource.Idle)
+    val imageUpload: StateFlow<Resource<String>> = _imageUpload.asStateFlow()
+
     private val _editingProduct = MutableStateFlow<Product?>(null)
     val editingProduct: StateFlow<Product?> = _editingProduct.asStateFlow()
 
@@ -116,16 +123,25 @@ class SellerViewModel(
     }
 
     fun clearDeleteState() { _deleteState.value = Resource.Idle }
-
     companion object {
         fun factory(context: Context) = viewModelFactory {
             initializer {
                 val api = RetrofitClient.getInstance(context)
                 SellerViewModel(
                     sellerRepo = SellerRepository(api),
-                    productRepo = ProductRepository(api)
+                    productRepo = ProductRepository(api),
+                    imageRepo = ImageRepository()     // ← add
                 )
             }
         }
     }
+
+    fun uploadProductImage(context: Context, uri: Uri) {
+        viewModelScope.launch {
+            _imageUpload.value = Resource.Loading
+            _imageUpload.value = imageRepo.uploadProductImage(context, uri)
+        }
+    }
+
+    fun clearImageUpload() { _imageUpload.value = Resource.Idle }
 }

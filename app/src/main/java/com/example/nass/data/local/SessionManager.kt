@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface SessionManager {
     val tokenFlow: Flow<String?>
     val roleFlow: Flow<String?>
+    val usernameFlow: Flow<String?>
 
     suspend fun saveSession(
         token: String,

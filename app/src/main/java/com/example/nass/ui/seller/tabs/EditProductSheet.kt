@@ -1,5 +1,9 @@
 package com.example.nass.ui.seller.tabs
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,6 +34,7 @@ import com.example.nass.data.model.CreateProductRequest
 import com.example.nass.data.model.Product
 import com.example.nass.ui.seller.SellerViewModel
 import com.example.nass.util.Resource
+import java.util.Locale
 
 private val CATEGORIES = listOf("Clothing", "Shoes", "Accessories", "Bags", "Other")
 
@@ -39,8 +46,10 @@ fun EditProductSheet(
     onDismiss: () -> Unit,
     onMessage: (String) -> Unit
 ) {
+    val context = LocalContext.current
     val updateState by vm.updateState.collectAsStateWithLifecycle()
     val deleteState by vm.deleteState.collectAsStateWithLifecycle()
+    val uploadState by vm.imageUpload.collectAsStateWithLifecycle()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -49,7 +58,7 @@ fun EditProductSheet(
     var description by remember(product.id) { mutableStateOf(product.description ?: "") }
     var priceText by remember(product.id) {
         mutableStateOf(
-            if (product.price == 0.0) "" else String.format(java.util.Locale.US, "%.2f", product.price)
+            if (product.price == 0.0) "" else String.format(Locale.US, "%.2f", product.price)
         )
     }
     var category by remember(product.id) { mutableStateOf(product.category) }
@@ -61,14 +70,37 @@ fun EditProductSheet(
     val isFormValid = name.isNotBlank() && priceValue != null && priceValue > 0
     val isUpdating = updateState is Resource.Loading
     val isDeleting = deleteState is Resource.Loading
-    val isBusy = isUpdating || isDeleting
+    val isUploading = uploadState is Resource.Loading
+    val isBusy = isUpdating || isDeleting || isUploading
+
+    // ---- Image picker launcher ----
+    val pickImage = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        if (uri != null) vm.uploadProductImage(context, uri)
+    }
+
+    // ---- React to upload result ----
+    LaunchedEffect(uploadState) {
+        when (val s = uploadState) {
+            is Resource.Success -> {
+                imageUrl = s.data
+                vm.clearImageUpload()
+            }
+            is Resource.Error -> {
+                onMessage(s.message)
+                vm.clearImageUpload()
+            }
+            else -> Unit
+        }
+    }
 
     // ---- React to update result ----
     LaunchedEffect(updateState) {
         when (val s = updateState) {
             is Resource.Success -> {
                 onMessage("Listing updated")
-                vm.cancelEdit()      // closes sheet, clears states
+                vm.cancelEdit()
             }
             is Resource.Error -> {
                 onMessage(s.message)
@@ -132,7 +164,7 @@ fun EditProductSheet(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(200.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
@@ -144,17 +176,58 @@ fun EditProductSheet(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
+                    IconButton(
+                        onClick = { imageUrl = "" },
+                        enabled = !isBusy,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(4.dp)
+                    ) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                            shape = RoundedCornerShape(50)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Remove image",
+                                modifier = Modifier.padding(6.dp)
+                            )
+                        }
+                    }
+                } else if (isUploading) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator()
+                        Spacer(Modifier.height(8.dp))
+                        Text("Uploading image…", fontSize = 12.sp)
+                    }
                 } else {
                     Icon(
                         imageVector = Icons.Default.Image,
                         contentDescription = null,
-                        modifier = Modifier.size(40.dp),
+                        modifier = Modifier.size(44.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(10.dp))
+
+            // ---- Image picker button ----
+            OutlinedButton(
+                onClick = {
+                    pickImage.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                },
+                enabled = !isBusy,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.PhotoCamera, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(if (imageUrl.isBlank()) "Add image from phone" else "Change image")
+            }
+
+            Spacer(Modifier.height(20.dp))
 
             OutlinedTextField(
                 value = name,
@@ -233,21 +306,6 @@ fun EditProductSheet(
                     }
                 }
             }
-
-            Spacer(Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = imageUrl,
-                onValueChange = { imageUrl = it },
-                label = { Text("Image URL (optional)") },
-                singleLine = true,
-                enabled = !isBusy,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Uri,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
 
             Spacer(Modifier.height(24.dp))
 

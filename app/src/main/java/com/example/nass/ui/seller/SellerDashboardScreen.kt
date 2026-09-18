@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nass.data.local.SessionStore
 import com.example.nass.ui.seller.tabs.AddProductTab
 import com.example.nass.ui.seller.tabs.EditProductSheet
 import com.example.nass.ui.seller.tabs.ListingsTab
@@ -23,7 +24,7 @@ import com.example.nass.ui.common.SettingsScreen
  * Seller dashboard shell.
  *
  * Bottom-nav tabs map to the seller's main workflows:
- *  - Stats     → live counts of added / sold / available
+ *
  *  - Listings  → all products with filter chips + tap to edit
  *  - Add       → form for creating a new listing
  *  - Profile   → placeholder, built last
@@ -46,12 +47,13 @@ fun SellerDashboardScreen(onLogout: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     val editing by vm.editingProduct.collectAsStateWithLifecycle()
+    val username by SessionStore.from(context).usernameFlow.collectAsState(initial = "")
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Seller — ${currentTab.label}") },
+                title = { Text("Welcome ${username ?: ""}") },
                 actions = {
                     IconButton(onClick = onLogout) {
                         Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout")

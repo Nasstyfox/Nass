@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nass.data.local.SessionStore
 import com.example.nass.ui.admin.tabs.UsersTab
 import com.example.nass.ui.common.SettingsScreen
 import kotlinx.coroutines.launch
@@ -31,12 +32,13 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     val selected by vm.selectedUser.collectAsStateWithLifecycle()
+    val username by SessionStore.from(context).usernameFlow.collectAsState(initial = "")
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Admin — ${currentTab.label}") },
+                title = { Text("Welcome ${username ?: ""}") },
                 actions = {
                     IconButton(onClick = onLogout) {
                         Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout")

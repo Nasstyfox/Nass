@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nass.data.local.SessionStore
 import com.example.nass.ui.buyer.tabs.BrowseTab
 import com.example.nass.ui.buyer.tabs.CartTab
 import com.example.nass.ui.buyer.tabs.HistoryTab
@@ -39,11 +40,13 @@ fun BuyerDashboardScreen(onLogout: () -> Unit) {
     val cartState by vm.cart.collectAsStateWithLifecycle()
     val cartCount = (cartState as? Resource.Success)?.data?.size ?: 0
 
+    val username by SessionStore.from(context).usernameFlow.collectAsState(initial = "")
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Buyer — ${currentTab.label}") },
+                title = { Text("Welcome ${username ?: ""}") },
                 actions = {
                     IconButton(onClick = onLogout) {
                         Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout")

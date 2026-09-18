@@ -1,5 +1,9 @@
 package com.example.nass.ui.seller.tabs
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,7 +12,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,9 +41,12 @@ fun AddProductTab(
     vm: SellerViewModel,
     onProductAdded: () -> Unit
 ) {
+    val context = LocalContext.current
     val state by vm.createState.collectAsStateWithLifecycle()
+    val uploadState by vm.imageUpload.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
 
+    // ---- Form state ----
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var priceText by remember { mutableStateOf("") }
@@ -45,19 +54,42 @@ fun AddProductTab(
     var imageUrl by remember { mutableStateOf("") }
     var categoryExpanded by remember { mutableStateOf(false) }
 
-    // ---- validation ----
     val priceValue = priceText.toDoubleOrNull()
     val isFormValid = name.isNotBlank() && priceValue != null && priceValue > 0
     val isLoading = state is Resource.Loading
+    val isUploading = uploadState is Resource.Loading
 
-    // ---- react to submission result ----
+    // ---- Image picker launcher ----
+    val pickImage = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        if (uri != null) vm.uploadProductImage(context, uri)
+    }
+
+    // ---- React to upload result ----
+    LaunchedEffect(uploadState) {
+        when (val s = uploadState) {
+            is Resource.Success -> {
+                imageUrl = s.data
+                vm.clearImageUpload()
+            }
+            is Resource.Error -> {
+                snackbarHost.showSnackbar(s.message)
+                vm.clearImageUpload()
+            }
+            else -> Unit
+        }
+    }
+
+    // ---- React to submission result ----
     LaunchedEffect(state) {
         when (val s = state) {
             is Resource.Success -> {
                 snackbarHost.showSnackbar("Product added successfully")
-                name = ""; description = ""; priceText = ""; category = "Clothing"; imageUrl = ""
+                name = ""; description = ""; priceText = ""
+                category = "Clothing"; imageUrl = ""
                 vm.clearCreateState()
-                onProductAdded()          // dashboard switches to Listings tab
+                onProductAdded()
             }
             is Resource.Error -> {
                 snackbarHost.showSnackbar(s.message)
@@ -86,11 +118,11 @@ fun AddProductTab(
 
             Spacer(Modifier.height(16.dp))
 
-            // ---- Live image preview ----
+            // ---- Image preview (tappable to pick) ----
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(200.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
@@ -102,22 +134,64 @@ fun AddProductTab(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
+                    // Small floating clear button when an image exists
+                    IconButton(
+                        onClick = { imageUrl = "" },
+                        enabled = !isLoading && !isUploading,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(4.dp)
+                    ) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                            shape = RoundedCornerShape(50)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Remove image",
+                                modifier = Modifier.padding(6.dp)
+                            )
+                        }
+                    }
+                } else if (isUploading) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator()
+                        Spacer(Modifier.height(8.dp))
+                        Text("Uploading image…", fontSize = 12.sp)
+                    }
                 } else {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             imageVector = Icons.Default.Image,
                             contentDescription = null,
-                            modifier = Modifier.size(40.dp),
+                            modifier = Modifier.size(44.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(Modifier.height(4.dp))
+                        Spacer(Modifier.height(6.dp))
                         Text(
-                            "Image preview",
+                            "No image yet",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
+            }
+
+            Spacer(Modifier.height(10.dp))
+
+            // ---- Image picker button ----
+            OutlinedButton(
+                onClick = {
+                    pickImage.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                },
+                enabled = !isLoading && !isUploading,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.PhotoCamera, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(if (imageUrl.isBlank()) "Add image from phone" else "Change image")
             }
 
             Spacer(Modifier.height(20.dp))
@@ -152,7 +226,6 @@ fun AddProductTab(
             OutlinedTextField(
                 value = priceText,
                 onValueChange = { input ->
-                    // allow digits and one decimal point
                     if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
                         priceText = input
                     }
@@ -184,7 +257,9 @@ fun AddProductTab(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Category") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded)
+                    },
                     enabled = !isLoading,
                     modifier = Modifier
                         .menuAnchor(MenuAnchorType.PrimaryNotEditable)
@@ -206,22 +281,6 @@ fun AddProductTab(
                 }
             }
 
-            Spacer(Modifier.height(12.dp))
-
-            // ---- Image URL ----
-            OutlinedTextField(
-                value = imageUrl,
-                onValueChange = { imageUrl = it },
-                label = { Text("Image URL (optional)") },
-                singleLine = true,
-                enabled = !isLoading,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Uri,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-
             Spacer(Modifier.height(24.dp))
 
             // ---- Submit ----
@@ -236,7 +295,7 @@ fun AddProductTab(
                     )
                     vm.createProduct(req)
                 },
-                enabled = isFormValid && !isLoading,
+                enabled = isFormValid && !isLoading && !isUploading,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (isLoading) {

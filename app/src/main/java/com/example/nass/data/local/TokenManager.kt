@@ -21,6 +21,7 @@ class TokenManager(private val context: Context) : SessionManager {
 
     override val tokenFlow: Flow<String?> = context.dataStore.data.map { it[tokenKey] }
     override val roleFlow: Flow<String?> = context.dataStore.data.map { it[roleKey] }
+    override val usernameFlow: Flow<String?> = context.dataStore.data.map { it[usernameKey] }
 
     override suspend fun saveSession(
         token: String,
