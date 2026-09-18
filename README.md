@@ -49,15 +49,15 @@ changing password.
 
 | Login | Seller — Stats | Seller — Listings |
 |-------|----------------|-------------------|
-| ![Login](docs/screenshots/01_login.jpg) | ![Stats](docs/screenshots/02_seller_stats.jpg) | ![Listings](docs/screenshots/03_seller_listings.jpg) |
+| ![Login](docs/screenshots/login.png) | ![Stats](docs/screenshots/seller_stats.png) | ![Listings](docs/screenshots/seller_listings.png) |
 
 | Buyer — Browse | Buyer — Cart | Buyer — History |
 |----------------|--------------|-----------------|
-| ![Browse](docs/screenshots/04_buyer_browse.jpg) | ![Cart](docs/screenshots/05_buyer_cart.jpg) | ![History](docs/screenshots/06_buyer_history.jpg) |
+| ![Browse](docs/screenshots/buyer_browse.png) | ![Cart](docs/screenshots/buyer_cart.png) | ![History](docs/screenshots/buyer_history.png) |
 
 | Admin — Users | Settings | App Icon |
 |---------------|----------|----------|
-| ![Admin](docs/screenshots/07_admin_users.jpg) | ![Settings](docs/screenshots/08_settings.jpg) | ![Icon](docs/screenshots/09_icon.jpg) |
+| ![Admin](docs/screenshots/admin_users.png) | ![Settings](docs/screenshots/settings.png) | ![Icon](docs/screenshots/icon.png) |
 
 ---
 
