@@ -49,7 +49,7 @@ changing password.
 
 | Login | Seller — Stats | Seller — Listings |
 |-------|----------------|-------------------|
-| ![Login](docs/screenshots/login.png) | ![Stats](docs/screenshots/seller_stats.png) | ![Listings](docs/screenshots/seller_listings.png) |
+| ![Login](docs/screenshots/login.png) | ![Stats](docs/screenshots/seller_stats.png) | ![Listings](docs/screenshots/seller_listings_all.png) |
 
 | Buyer — Browse | Buyer — Cart | Buyer — History |
 |----------------|--------------|-----------------|
