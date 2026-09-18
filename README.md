@@ -341,34 +341,3 @@ The Independent Institute of Education
 
 **Signed:** Tshiamo Mbatha (ST10070515)
 **Date:** 16 September 2026
-
-### 4. Backend controller logic
-
-AI helped design the checkout flow to use a MySQL `START TRANSACTION ...
-COMMIT` block so that marking products as sold, creating transaction rows, and
-clearing the cart all happen atomically. I tested the rollback behaviour
-manually by killing ngrok mid-checkout.
-
-## What AI Was NOT Used For
-
-- The database schema was written by me based on the POE brief
-- The authentication middleware (`authMiddleware.js`, `adminMiddleware.js`)
-  was written by me
-- All Postman tests were written and executed by me
-- The final selection of which features to prioritise was my decision
-
-## Verification
-
-Every AI-generated code snippet was:
-
-1. Read and understood before use
-2. Adapted to the project's naming and design language
-3. Tested against the live backend and physical device
-4. Committed with descriptive messages in GitHub
-
-No code was committed that I could not explain line-by-line in a code review.
-
----
-
-**Signed:** Tshiamo Mbatha (ST10070515)
-**Date:** 16 September 2026
