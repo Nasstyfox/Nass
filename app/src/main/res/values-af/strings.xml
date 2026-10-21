@@ -1,0 +1,185 @@
+<resources>
+    <string name="app_name">Nass</string>
+
+    <!-- Auth -->
+    <string name="login_title">Welkom terug</string>
+    <string name="login_subtitle">Koop en verkoop tweedehandse klere</string>
+    <string name="username">Gebruikersnaam</string>
+    <string name="password">Wagwoord</string>
+    <string name="sign_in">Teken in</string>
+    <string name="no_account">Het jy nie \'n rekening nie? Registreer</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Instellings</string>
+    <string name="display_name">Vertoonnaam</string>
+    <string name="save_display_name">Stoor Vertoonnaam</string>
+    <string name="change_password">Verander Wagwoord</string>
+    <string name="logout">Teken uit</string>
+    <string name="language">Taal</string>
+    <string name="select_language">Kies Taal</string>
+
+    <!-- Common UI -->
+    <string name="btn_retry">Probeer weer</string>
+    <string name="btn_refresh">Verfris</string>
+    <string name="btn_cancel">Kanselleer</string>
+    <string name="btn_confirm">Bevestig</string>
+    <string name="loading">Laai tans…</string>
+    <string name="item_singular">item</string>
+    <string name="item_plural">items</string>
+
+    <!-- Tabs -->
+    <string name="tab_browse">Blaai</string>
+    <string name="tab_cart">Mandjie</string>
+    <string name="tab_history">Geskiedenis</string>
+    <string name="tab_profile">Profiel</string>
+    <string name="tab_stats">Statistieke</string>
+    <string name="tab_listings">Lysies</string>
+    <string name="tab_add">Voeg by</string>
+    <string name="tab_users">Gebruikers</string>
+
+    <!-- Dashboard -->
+    <string name="welcome_user">Welkom %1$s</string>
+    <string name="buyer_title">Koper — %1$s</string>
+    <string name="seller_title">Verkoper — %1$s</string>
+    <string name="admin_title">Admin — %1$s</string>
+
+    <!-- Buyer/Cart Shared -->
+    <string name="buyer_cart_title">Jou Mandjie</string>
+    <string name="cart_total">Totaal</string>
+    <string name="cart_checkout">Betaal</string>
+    <string name="confirm_purchase">Bevestig aankoop</string>
+
+    <!-- Seller Shared -->
+    <string name="sold_item_error">Verkoopte items kan nie gewysig word nie</string>
+
+    <!-- Seller Stats -->
+    <string name="stats_title">Jou verkoop-oorsig</string>
+    <string name="stats_subtitle">Lewendige tellings van jou lysies</string>
+    <string name="stats_loading">Laai tans jou statistieke…</string>
+    <string name="stats_error">Kon nie statistieke laai nie</string>
+    <string name="stats_total_added">Totaal Bygevoeg</string>
+    <string name="stats_total_sold">Totaal Verkoop</string>
+    <string name="stats_available">Beskikbaar vir Verkoop</string>
+
+    <!-- Seller Listings -->
+    <string name="listings_title">My Lysies</string>
+    <string name="listings_count">%1$d items</string>
+    <string name="listings_count_single">%1$d item</string>
+    <string name="filter_all">Alles</string>
+    <string name="filter_available">Beskikbaar</string>
+    <string name="filter_sold">Verkoop</string>
+    <string name="listings_loading">Laai tans jou lysies…</string>
+    <string name="listings_error">Kon nie lysies laai nie</string>
+    <string name="listings_empty_title">Nog geen lysies nie</string>
+    <string name="listings_empty_sub">Tik op die Voeg by-oortjie om jou eerste item te plaas</string>
+    <string name="listings_filter_empty">Geen %1$s items nie</string>
+    <string name="badge_sold">VERKOOP</string>
+
+    <!-- Seller Add/Edit -->
+    <string name="add_title">Plaas \'n nuwe item</string>
+    <string name="add_subtitle">Vul die besonderhede hieronder in</string>
+    <string name="image_uploading">Laai tans prent op…</string>
+    <string name="image_no_image">Nog geen prent nie</string>
+    <string name="image_add_btn">Voeg prent by vanaf foon</string>
+    <string name="image_change_btn">Verander prent</string>
+    <string name="field_item_name">Item naam *</string>
+    <string name="field_description">Beskrywing</string>
+    <string name="field_price">Prys (R) *</string>
+    <string name="field_price_error">Voer \'n geldige nommer in</string>
+    <string name="field_category">Kategorie</string>
+    <string name="btn_post_item">Plaas Item</string>
+    <string name="field_required">* vereiste veld</string>
+    <string name="msg_product_added">Item suksesvol bygevoeg</string>
+
+    <!-- Categories -->
+    <string name="cat_clothing">Klere</string>
+    <string name="cat_shoes">Skoene</string>
+    <string name="cat_accessories">Bykomstighede</string>
+    <string name="cat_bags">Sakke</string>
+    <string name="cat_other">Ander</string>
+
+    <!-- Edit Sheet -->
+    <string name="edit_title">Wysig lysie</string>
+    <string name="edit_subtitle">Dateer die besonderhede hieronder op</string>
+    <string name="btn_save_changes">Stoor Veranderinge</string>
+    <string name="btn_delete_listing">Verwyder Lysie</string>
+    <string name="dialog_delete_title">Verwyder lysie?</string>
+    <string name="dialog_delete_msg">\"%1$s\" sal permanent verwyder word. Dit kan nie ongedaan gemaak word nie.</string>
+    <string name="btn_delete">Verwyder</string>
+    <string name="msg_listing_updated">Lysie opgedateer</string>
+    <string name="msg_listing_deleted">Lysie verwyder</string>
+
+    <!-- Product Detail Sheet -->
+    <string name="sold_by">Verkoop deur %1$s</string>
+    <string name="by_seller">deur %1$s</string>
+    <string name="product_description">Beskrywing</string>
+    <string name="btn_add_to_cart">Voeg by mandjie</string>
+    <string name="msg_added_to_cart">Bygevoeg by mandjie</string>
+
+    <!-- Browse Tab -->
+    <string name="browse_title">Blaai</string>
+    <string name="browse_loading">Laai tans lysies…</string>
+    <string name="browse_error">Kon nie lysies laai nie</string>
+    <string name="browse_empty_title">Nog niks te koop nie</string>
+    <string name="browse_empty_sub">Kyk binnekort weer</string>
+
+    <!-- Cart Tab -->
+    <string name="cart_purchase_complete">Aankoop voltooi — %1$s</string>
+    <string name="cart_removed">Verwyder uit mandjie</string>
+    <string name="cart_buy_msg">Jy is op die punt om %1$s te koop.</string>
+    <string name="cart_total_msg">Totaal: %1$s</string>
+    <string name="cart_warning">Dit kan nie ongedaan gemaak word nie.</string>
+    <string name="cart_remove_desc">Verwyder</string>
+    <string name="cart_loading">Laai tans jou mandjie…</string>
+    <string name="cart_error">Kon nie mandjie laai nie</string>
+    <string name="cart_empty_title">Jou mandjie is leeg</string>
+    <string name="cart_empty_sub">Blaai deur lysies om iets by te voeg</string>
+    <string name="btn_browse_listings">Blaai Lysies</string>
+
+    <!-- History Tab -->
+    <string name="history_title">Aankoopgeskiedenis</string>
+    <string name="history_order">Bestelling #%1$d</string>
+    <string name="history_loading">Laai tans jou aankope…</string>
+    <string name="history_error">Kon nie geskiedenis laai nie</string>
+    <string name="history_empty_title">Nog geen aankope nie</string>
+    <string name="history_empty_sub">Jou bestellings sal hier verskyn</string>
+    <string name="desc_expand">Vou oop</string>
+    <string name="desc_collapse">Vou toe</string>
+    <string name="desc_logout">Teken uit</string>
+
+    <string name="admin_users_title">Gebruikers</string>
+    <string name="admin_users_count">%1$d gebruikers</string>
+    <string name="admin_users_count_single">%1$d gebruiker</string>
+    <string name="admin_loading_users">Laai tans gebruikers…</string>
+    <string name="admin_users_error">Kon nie gebruikers laai nie</string>
+    <string name="admin_filter_empty">Geen %1$s gebruikers nie</string>
+    <string name="admin_id_label">ID %1$d</string>
+
+    <!--string name="filter_all">Alles</string-->
+    <string name="filter_pending">Hangende</string>
+    <string name="filter_active">Aktief</string>
+    <string name="filter_suspended">Opgeskort</string>
+
+    <string name="status_pending">HANGENDE</string>
+    <string name="status_active">AKTIEF</string>
+    <string name="status_suspended">OPGESKORT</string>
+    <string name="role_buyer">koper</string>
+    <string name="role_seller">verkoper</string>
+    <string name="role_admin">admin</string>
+
+    <string name="admin_status_label">Status:</string>
+    <string name="admin_btn_verify">Verifieer Gebruiker</string>
+    <string name="admin_role_label">Rol</string>
+    <string name="admin_btn_save_role">Stoor Rol</string>
+    <string name="admin_btn_reset_pwd">Herstel Wagwoord</string>
+    <string name="admin_btn_delete_user">Verwyder Gebruiker</string>
+
+    <string name="admin_delete_title">Verwyder gebruiker?</string>
+    <string name="admin_delete_msg">\"%1$s\" en al hul lysies, mandjie-items en transaksies sal permanent verwyder word.</string>
+    <string name="admin_reset_title">Herstel wagwoord</string>
+    <string name="admin_reset_msg">Stel \'n nuwe wagwoord op vir @%1$s:</string>
+    <string name="admin_field_new_pwd">Nuwe wagwoord</string>
+    <string name="admin_reset_hint">Minimum 6 karakters.</string>
+    <string name="admin_btn_reset">Herstel</string>
+
+</resources>

@@ -1,0 +1,185 @@
+<resources>
+    <string name="app_name">Nass</string>
+
+    <!-- Auth -->
+    <string name="login_title">Siyakwamukela futhi</string>
+    <string name="login_subtitle">Thenga futhi udayise izingubo ezisetshenzisiwe</string>
+    <string name="username">Igama lomsebenzisi</string>
+    <string name="password">Iphasiwedi</string>
+    <string name="sign_in">Ngena ngemvume</string>
+    <string name="no_account">Awunayo i-akhawunti? Bhalisa</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Izilungiselelo</string>
+    <string name="display_name">Igama lokubonisa</string>
+    <string name="save_display_name">Gcina Igama</string>
+    <string name="change_password">Shintsha Iphasiwedi</string>
+    <string name="logout">Phuma</string>
+    <string name="language">Ulimi</string>
+    <string name="select_language">Khetha Ulimi</string>
+
+    <!-- Common UI -->
+    <string name="btn_retry">Zama futhi</string>
+    <string name="btn_refresh">Vuselela</string>
+    <string name="btn_cancel">Khansela</string>
+    <string name="btn_confirm">Qinisekisa</string>
+    <string name="loading">Iyalayisha…</string>
+    <string name="item_singular">into</string>
+    <string name="item_plural">izinto</string>
+
+    <!-- Tabs -->
+    <string name="tab_browse">Phequlula</string>
+    <string name="tab_cart">Inqola</string>
+    <string name="tab_history">Umlando</string>
+    <string name="tab_profile">Iphrofayela</string>
+    <string name="tab_stats">Izibalo</string>
+    <string name="tab_listings">Uhlu</string>
+    <string name="tab_add">Engeza</string>
+    <string name="tab_users">Abasebenzisi</string>
+
+    <!-- Dashboard -->
+    <string name="welcome_user">Siyakwamukela %1$s</string>
+    <string name="buyer_title">Umthengi — %1$s</string>
+    <string name="seller_title">Umdayisi — %1$s</string>
+    <string name="admin_title">Admin — %1$s</string>
+
+    <!-- Buyer/Cart Shared -->
+    <string name="buyer_cart_title">Inqola Yakho</string>
+    <string name="cart_total">Isamba</string>
+    <string name="cart_checkout">Khokha</string>
+    <string name="confirm_purchase">Qinisekisa ukuthenga</string>
+
+    <!-- Seller Shared -->
+    <string name="sold_item_error">Izinto ezithengisiweyo azikwazi ukuhlelwa</string>
+
+    <!-- Seller Stats -->
+    <string name="stats_title">Ukubuka konke kokudayisa kwakho</string>
+    <string name="stats_subtitle">Izibalo ezibukhoma ezivela ohlwini lwakho</string>
+    <string name="stats_loading">Iyalayisha izibalo zakho…</string>
+    <string name="stats_error">Ayikwazanga ukulayisha izibalo</string>
+    <string name="stats_total_added">Isamba Esingeziwe</string>
+    <string name="stats_total_sold">Isamba Esidayisiwe</string>
+    <string name="stats_available">Kuyatholakala Ukudayiswa</string>
+
+    <!-- Seller Listings -->
+    <string name="listings_title">Uhlu Lwami</string>
+    <string name="listings_count">izinto ezingama-%1$d</string>
+    <string name="listings_count_single">into engu-%1$d</string>
+    <string name="filter_all">Konke</string>
+    <string name="filter_available">Kuyatholakala</string>
+    <string name="filter_sold">Kudayisiwe</string>
+    <string name="listings_loading">Iyalayisha uhlu lwakho…</string>
+    <string name="listings_error">Ayikwazanga ukulayisha uhlu</string>
+    <string name="listings_empty_title">Alukho uhlu okwamanje</string>
+    <string name="listings_empty_sub">Thepha ithebhu ye-Engeza ukuthumela into yakho yokuqala</string>
+    <string name="listings_filter_empty">Azikho izinto ezingama-%1$s</string>
+    <string name="badge_sold">KUTHENGISIWE</string>
+
+    <!-- Seller Add/Edit -->
+    <string name="add_title">Thumela into entsha</string>
+    <string name="add_subtitle">Gcwalisa imininingwane ngezansi</string>
+    <string name="image_uploading">Iyalayisha isithombe…</string>
+    <string name="image_no_image">Asikho isithombe okwamanje</string>
+    <string name="image_add_btn">Engeza isithombe kusuka ocingweni</string>
+    <string name="image_change_btn">Shintsha isithombe</string>
+    <string name="field_item_name">Igama lento *</string>
+    <string name="field_description">Incazelo</string>
+    <string name="field_price">Intengo (R) *</string>
+    <string name="field_price_error">Faka inombolo evumelekile</string>
+    <string name="field_category">Isigaba</string>
+    <string name="btn_post_item">Thumela Into</string>
+    <string name="field_required">* inkambu edingekayo</string>
+    <string name="msg_product_added">Into yengezwe ngempumelelo</string>
+
+    <!-- Categories -->
+    <string name="cat_clothing">Izingubo</string>
+    <string name="cat_shoes">Izicathulo</string>
+    <string name="cat_accessories">Izinsiza</string>
+    <string name="cat_bags">Izikhwama</string>
+    <string name="cat_other">Okunye</string>
+
+    <!-- Edit Sheet -->
+    <string name="edit_title">Hlela uhlu</string>
+    <string name="edit_subtitle">Buyekeza imininingwane ngezansi</string>
+    <string name="btn_save_changes">Gcina Izinguquko</string>
+    <string name="btn_delete_listing">Susa Uhlu</string>
+    <string name="dialog_delete_title">Susa uhlu?</string>
+    <string name="dialog_delete_msg">I-\"%1$s\" izosuswa unomphela. Lokhu ngeke kusulwe.</string>
+    <string name="btn_delete">Susa</string>
+    <string name="msg_listing_updated">Uhlu lubuyekezwe</string>
+    <string name="msg_listing_deleted">Uhlu lususiwe</string>
+
+    <!-- Product Detail Sheet -->
+    <string name="sold_by">Idayiswa ngu-%1$s</string>
+    <string name="by_seller">nge-%1$s</string>
+    <string name="product_description">Incazelo</string>
+    <string name="btn_add_to_cart">Engeza enqoleni</string>
+    <string name="msg_added_to_cart">Kungezwe enqoleni</string>
+
+    <!-- Browse Tab -->
+    <string name="browse_title">Phequlula</string>
+    <string name="browse_loading">Iyalayisha uhlu…</string>
+    <string name="browse_error">Ayikwazanga ukulayisha uhlu</string>
+    <string name="browse_empty_title">Akukho okudayiswayo okwamanje</string>
+    <string name="browse_empty_sub">Bheka maduze</string>
+
+    <!-- Cart Tab -->
+    <string name="cart_purchase_complete">Ukuthenga kuqediwe — %1$s</string>
+    <string name="cart_removed">Kususwe enqoleni</string>
+    <string name="cart_buy_msg">Usuzothenga %1$s.</string>
+    <string name="cart_total_msg">Isamba: %1$s</string>
+    <string name="cart_warning">Lokhu ngeke kusulwe.</string>
+    <string name="cart_remove_desc">Susa</string>
+    <string name="cart_loading">Iyalayisha inqola yakho…</string>
+    <string name="cart_error">Ayikwazanga ukulayisha inqola</string>
+    <string name="cart_empty_title">Inqola yakho ayinalutho</string>
+    <string name="cart_empty_sub">Phequlula uhlu ukuze wengeze okuthile</string>
+    <string name="btn_browse_listings">Phequlula Uhlu</string>
+
+    <!-- History Tab -->
+    <string name="history_title">Umlando Wokuthenga</string>
+    <string name="history_order">I-oda #%1$d</string>
+    <string name="history_loading">Iyalayisha izinto ozithengile…</string>
+    <string name="history_error">Ayikwazanga ukulayisha umlando</string>
+    <string name="history_empty_title">Akukho okuthengiwe okwamanje</string>
+    <string name="history_empty_sub">Ama-oda akho azovela lapha</string>
+    <string name="desc_expand">Nweba</string>
+    <string name="desc_collapse">Goqa</string>
+    <string name="desc_logout">Phuma</string>
+
+    <string name="admin_users_title">Abasebenzisi</string>
+    <string name="admin_users_count">abasebenzisi abangama-%1$d</string>
+    <string name="admin_users_count_single">umsebenzisi ongu-%1$d</string>
+    <string name="admin_loading_users">Iyalayisha abasebenzisi…</string>
+    <string name="admin_users_error">Ayikwazanga ukulayisha abasebenzisi</string>
+    <string name="admin_filter_empty">Abekho abasebenzisi abangama-%1$s</string>
+    <string name="admin_id_label">I-ID %1$d</string>
+
+    <!--string name="filter_all">Konke</string-->
+    <string name="filter_pending">Kulindile</string>
+    <string name="filter_active">Kuyasebenza</string>
+    <string name="filter_suspended">Kumisiwe</string>
+
+    <string name="status_pending">KULINDILE</string>
+    <string name="status_active">KUYASEBENZA</string>
+    <string name="status_suspended">KUMISIWE</string>
+    <string name="role_buyer">umthengi</string>
+    <string name="role_seller">umdayisi</string>
+    <string name="role_admin">admin</string>
+
+    <string name="admin_status_label">Isimo:</string>
+    <string name="admin_btn_verify">Qinisekisa Umsebenzisi</string>
+    <string name="admin_role_label">Iqhaza</string>
+    <string name="admin_btn_save_role">Gcina Iqhaza</string>
+    <string name="admin_btn_reset_pwd">Setha kabusha Iphasiwedi</string>
+    <string name="admin_btn_delete_user">Susa Umsebenzisi</string>
+
+    <string name="admin_delete_title">Susa umsebenzisi?</string>
+    <string name="admin_delete_msg">U-\"%1$s\" nakho konke okulotshiwe, izinto ze-inqola, kanye nokuthengiselana kuzosuswa unomphela.</string>
+    <string name="admin_reset_title">Setha kabusha iphasiwedi</string>
+    <string name="admin_reset_msg">Setha iphasiwedi entsha ye-@%1$s:</string>
+    <string name="admin_field_new_pwd">Iphasiwedi entsha</string>
+    <string name="admin_reset_hint">Okungenani izinhlamvu eziyisi-6.</string>
+    <string name="admin_btn_reset">Setha kabusha</string>
+
+</resources>
