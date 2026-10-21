@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.nass.R
 import com.example.nass.data.model.CreateProductRequest
 import com.example.nass.ui.seller.SellerViewModel
 import com.example.nass.util.Resource
@@ -46,7 +48,6 @@ fun AddProductTab(
     val uploadState by vm.imageUpload.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
 
-    // ---- Form state ----
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var priceText by remember { mutableStateOf("") }
@@ -59,148 +60,88 @@ fun AddProductTab(
     val isLoading = state is Resource.Loading
     val isUploading = uploadState is Resource.Loading
 
-    // ---- Image picker launcher ----
-    val pickImage = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
+    val pickImage = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
         if (uri != null) vm.uploadProductImage(context, uri)
     }
 
-    // ---- React to upload result ----
     LaunchedEffect(uploadState) {
         when (val s = uploadState) {
-            is Resource.Success -> {
-                imageUrl = s.data
-                vm.clearImageUpload()
-            }
-            is Resource.Error -> {
-                snackbarHost.showSnackbar(s.message)
-                vm.clearImageUpload()
-            }
+            is Resource.Success -> { imageUrl = s.data; vm.clearImageUpload() }
+            is Resource.Error -> { snackbarHost.showSnackbar(s.message); vm.clearImageUpload() }
             else -> Unit
         }
     }
 
-    // ---- React to submission result ----
     LaunchedEffect(state) {
         when (val s = state) {
             is Resource.Success -> {
-                snackbarHost.showSnackbar("Product added successfully")
-                name = ""; description = ""; priceText = ""
-                category = "Clothing"; imageUrl = ""
+                snackbarHost.showSnackbar(context.getString(R.string.msg_product_added))
+                name = ""; description = ""; priceText = ""; category = "Clothing"; imageUrl = ""
                 vm.clearCreateState()
                 onProductAdded()
             }
-            is Resource.Error -> {
-                snackbarHost.showSnackbar(s.message)
-                vm.clearCreateState()
-            }
+            is Resource.Error -> { snackbarHost.showSnackbar(s.message); vm.clearCreateState() }
             else -> Unit
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHost) }
-    ) { padding ->
+    Scaffold(snackbarHost = { SnackbarHost(snackbarHost) }) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
+            modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp)
         ) {
-            Text("Post a new item", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-            Text(
-                "Fill in the details below",
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
+            Text(stringResource(R.string.add_title), fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.add_subtitle), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(16.dp))
 
-            // ---- Image preview (tappable to pick) ----
+            // ---- Image preview ----
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 if (imageUrl.isNotBlank() && imageUrl.startsWith("http")) {
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = "Preview",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    // Small floating clear button when an image exists
+                    AsyncImage(model = imageUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                     IconButton(
                         onClick = { imageUrl = "" },
                         enabled = !isLoading && !isUploading,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(4.dp)
+                        modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
                     ) {
-                        Surface(
-                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
-                            shape = RoundedCornerShape(50)
-                        ) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Remove image",
-                                modifier = Modifier.padding(6.dp)
-                            )
+                        Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f), shape = RoundedCornerShape(50)) {
+                            Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.padding(6.dp))
                         }
                     }
                 } else if (isUploading) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator()
                         Spacer(Modifier.height(8.dp))
-                        Text("Uploading image…", fontSize = 12.sp)
+                        Text(stringResource(R.string.image_uploading), fontSize = 12.sp)
                     }
                 } else {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = Icons.Default.Image,
-                            contentDescription = null,
-                            modifier = Modifier.size(44.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(44.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(6.dp))
-                        Text(
-                            "No image yet",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Text(stringResource(R.string.image_no_image), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
 
             Spacer(Modifier.height(10.dp))
 
-            // ---- Image picker button ----
             OutlinedButton(
-                onClick = {
-                    pickImage.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    )
-                },
+                onClick = { pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                 enabled = !isLoading && !isUploading,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Default.PhotoCamera, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text(if (imageUrl.isBlank()) "Add image from phone" else "Change image")
+                Text(stringResource(if (imageUrl.isBlank()) R.string.image_add_btn else R.string.image_change_btn))
             }
 
             Spacer(Modifier.height(20.dp))
 
-            // ---- Name ----
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Item name *") },
+                label = { Text(stringResource(R.string.field_item_name)) },
                 singleLine = true,
                 enabled = !isLoading,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -209,11 +150,10 @@ fun AddProductTab(
 
             Spacer(Modifier.height(12.dp))
 
-            // ---- Description ----
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Description") },
+                label = { Text(stringResource(R.string.field_description)) },
                 minLines = 3,
                 maxLines = 5,
                 enabled = !isLoading,
@@ -222,60 +162,56 @@ fun AddProductTab(
 
             Spacer(Modifier.height(12.dp))
 
-            // ---- Price ----
             OutlinedTextField(
                 value = priceText,
-                onValueChange = { input ->
-                    if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
-                        priceText = input
-                    }
-                },
-                label = { Text("Price (R) *") },
+                onValueChange = { input -> if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d{0,2}$"))) priceText = input },
+                label = { Text(stringResource(R.string.field_price)) },
                 singleLine = true,
                 enabled = !isLoading,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Next
-                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next),
                 isError = priceText.isNotEmpty() && priceValue == null,
-                supportingText = {
-                    if (priceText.isNotEmpty() && priceValue == null)
-                        Text("Enter a valid number")
-                },
+                supportingText = { if (priceText.isNotEmpty() && priceValue == null) Text(stringResource(R.string.field_price_error)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(12.dp))
 
-            // ---- Category dropdown ----
             ExposedDropdownMenuBox(
                 expanded = categoryExpanded,
                 onExpandedChange = { if (!isLoading) categoryExpanded = !categoryExpanded }
             ) {
+                // Translate the visual category, but keep the English one in state for the DB
+                val visualCategory = when(category) {
+                    "Clothing" -> stringResource(R.string.cat_clothing)
+                    "Shoes" -> stringResource(R.string.cat_shoes)
+                    "Accessories" -> stringResource(R.string.cat_accessories)
+                    "Bags" -> stringResource(R.string.cat_bags)
+                    "Other" -> stringResource(R.string.cat_other)
+                    else -> category
+                }
+
                 OutlinedTextField(
-                    value = category,
+                    value = visualCategory,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Category") },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded)
-                    },
+                    label = { Text(stringResource(R.string.field_category)) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
                     enabled = !isLoading,
-                    modifier = Modifier
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                        .fillMaxWidth()
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
                 )
-                ExposedDropdownMenu(
-                    expanded = categoryExpanded,
-                    onDismissRequest = { categoryExpanded = false }
-                ) {
+                ExposedDropdownMenu(expanded = categoryExpanded, onDismissRequest = { categoryExpanded = false }) {
                     CATEGORIES.forEach { c ->
+                        val menuText = when(c) {
+                            "Clothing" -> stringResource(R.string.cat_clothing)
+                            "Shoes" -> stringResource(R.string.cat_shoes)
+                            "Accessories" -> stringResource(R.string.cat_accessories)
+                            "Bags" -> stringResource(R.string.cat_bags)
+                            "Other" -> stringResource(R.string.cat_other)
+                            else -> c
+                        }
                         DropdownMenuItem(
-                            text = { Text(c) },
-                            onClick = {
-                                category = c
-                                categoryExpanded = false
-                            }
+                            text = { Text(menuText) },
+                            onClick = { category = c; categoryExpanded = false }
                         )
                     }
                 }
@@ -283,7 +219,6 @@ fun AddProductTab(
 
             Spacer(Modifier.height(24.dp))
 
-            // ---- Submit ----
             Button(
                 onClick = {
                     val req = CreateProductRequest(
@@ -299,25 +234,16 @@ fun AddProductTab(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
                 } else {
                     Icon(Icons.Default.Add, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Post Item")
+                    Text(stringResource(R.string.btn_post_item))
                 }
             }
 
             Spacer(Modifier.height(8.dp))
-
-            Text(
-                "* required field",
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Text(stringResource(R.string.field_required), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

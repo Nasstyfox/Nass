@@ -1,3 +1,190 @@
 <resources>
     <string name="app_name">Nass</string>
+
+    <!-- Auth -->
+    <string name="login_title">Welcome back</string>
+    <string name="login_subtitle">Buy and sell second-hand clothing</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="no_account">Don\'t have an account? Register</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="display_name">Display name</string>
+    <string name="save_display_name">Save Display Name</string>
+    <string name="change_password">Change Password</string>
+    <string name="logout">Logout</string>
+    <string name="language">Language</string>
+    <string name="select_language">Select Language</string>
+
+    <!-- Common UI -->
+    <string name="btn_retry">Retry</string>
+    <string name="btn_refresh">Refresh</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="loading">Loading…</string>
+    <string name="item_singular">item</string>
+    <string name="item_plural">items</string>
+
+    <!-- Tabs -->
+    <string name="tab_browse">Browse</string>
+    <string name="tab_cart">Cart</string>
+    <string name="tab_history">History</string>
+    <string name="tab_profile">Profile</string>
+    <string name="tab_stats">Stats</string>
+    <string name="tab_listings">Listings</string>
+    <string name="tab_add">Add</string>
+    <string name="tab_users">Users</string>
+
+    <!-- Dashboard -->
+    <string name="welcome_user">Welcome %1$s</string>
+    <string name="buyer_title">Buyer — %1$s</string>
+    <string name="seller_title">Seller — %1$s</string>
+    <string name="admin_title">Admin — %1$s</string>
+
+    <!-- Buyer/Cart Shared -->
+    <string name="buyer_cart_title">Your Cart</string>
+    <string name="cart_total">Total</string>
+    <string name="cart_checkout">Checkout</string>
+    <string name="confirm_purchase">Confirm purchase</string>
+
+    <!-- Seller Shared -->
+    <string name="sold_item_error">Sold items can\'t be edited</string>
+
+    <!-- Seller Stats -->
+    <string name="stats_title">Your selling overview</string>
+    <string name="stats_subtitle">Live counts from your listings</string>
+    <string name="stats_loading">Loading your stats…</string>
+    <string name="stats_error">Couldn\'t load stats</string>
+    <string name="stats_total_added">Total Added</string>
+    <string name="stats_total_sold">Total Sold</string>
+    <string name="stats_available">Available for Sale</string>
+
+    <!-- Seller Listings -->
+    <string name="listings_title">My Listings</string>
+    <string name="listings_count">%1$d items</string>
+    <string name="listings_count_single">%1$d item</string>
+    <string name="filter_all">All</string>
+    <string name="filter_available">Available</string>
+    <string name="filter_sold">Sold</string>
+    <string name="listings_loading">Loading your listings…</string>
+    <string name="listings_error">Couldn\'t load listings</string>
+    <string name="listings_empty_title">No listings yet</string>
+    <string name="listings_empty_sub">Tap the Add tab to post your first item</string>
+    <string name="listings_filter_empty">No %1$s items</string>
+    <string name="badge_sold">SOLD</string>
+
+    <!-- Seller Add/Edit -->
+    <string name="add_title">Post a new item</string>
+    <string name="add_subtitle">Fill in the details below</string>
+    <string name="image_uploading">Uploading image…</string>
+    <string name="image_no_image">No image yet</string>
+    <string name="image_add_btn">Add image from phone</string>
+    <string name="image_change_btn">Change image</string>
+    <string name="field_item_name">Item name *</string>
+    <string name="field_description">Description</string>
+    <string name="field_price">Price (R) *</string>
+    <string name="field_price_error">Enter a valid number</string>
+    <string name="field_category">Category</string>
+    <string name="btn_post_item">Post Item</string>
+    <string name="field_required">* required field</string>
+    <string name="msg_product_added">Product added successfully</string>
+
+    <!-- Categories -->
+    <string name="cat_clothing">Clothing</string>
+    <string name="cat_shoes">Shoes</string>
+    <string name="cat_accessories">Accessories</string>
+    <string name="cat_bags">Bags</string>
+    <string name="cat_other">Other</string>
+
+    <!-- Edit Sheet -->
+    <string name="edit_title">Edit listing</string>
+    <string name="edit_subtitle">Update the details below</string>
+    <string name="btn_save_changes">Save Changes</string>
+    <string name="btn_delete_listing">Delete Listing</string>
+    <string name="dialog_delete_title">Delete listing?</string>
+    <string name="dialog_delete_msg">\"%1$s\" will be permanently removed. This can\'t be undone.</string>
+    <string name="btn_delete">Delete</string>
+    <string name="msg_listing_updated">Listing updated</string>
+    <string name="msg_listing_deleted">Listing deleted</string>
+
+    <!-- Product Detail Sheet -->
+    <string name="sold_by">Sold by %1$s</string>
+    <string name="by_seller">by %1$s</string>
+    <string name="product_description">Description</string>
+    <string name="btn_add_to_cart">Add to Cart</string>
+    <string name="msg_added_to_cart">Added to cart</string>
+
+    <!-- Browse Tab -->
+    <string name="browse_title">Browse</string>
+    <string name="browse_loading">Loading listings…</string>
+    <string name="browse_error">Couldn\'t load listings</string>
+    <string name="browse_empty_title">Nothing for sale yet</string>
+    <string name="browse_empty_sub">Check back soon</string>
+
+    <!-- Cart Tab -->
+    <string name="cart_purchase_complete">Purchase complete — %1$s</string>
+    <string name="cart_removed">Removed from cart</string>
+    <string name="cart_buy_msg">You\'re about to buy %1$s.</string>
+    <string name="cart_total_msg">Total: %1$s</string>
+    <string name="cart_warning">This can\'t be undone.</string>
+    <string name="cart_remove_desc">Remove</string>
+    <string name="cart_loading">Loading your cart…</string>
+    <string name="cart_error">Couldn\'t load cart</string>
+    <string name="cart_empty_title">Your cart is empty</string>
+    <string name="cart_empty_sub">Browse listings to add something</string>
+    <string name="btn_browse_listings">Browse Listings</string>
+
+    <!-- History Tab -->
+    <string name="history_title">Purchase History</string>
+    <string name="history_order">Order #%1$d</string>
+    <string name="history_loading">Loading your purchases…</string>
+    <string name="history_error">Couldn\'t load history</string>
+    <string name="history_empty_title">No purchases yet</string>
+    <string name="history_empty_sub">Your orders will appear here</string>
+    <string name="desc_expand">Expand</string>
+    <string name="desc_collapse">Collapse</string>
+    <string name="desc_logout">Logout</string>
+
+    <!-- Admin Shared -->
+    <string name="admin_users_title">Users</string>
+    <string name="admin_users_count">%1$d users</string>
+    <string name="admin_users_count_single">%1$d user</string>
+    <string name="admin_loading_users">Loading users…</string>
+    <string name="admin_users_error">Couldn\'t load users</string>
+    <string name="admin_filter_empty">No %1$s users</string>
+    <string name="admin_id_label">ID %1$d</string>
+
+    <!-- Admin Filters -->
+    <!--string name="filter_all">All</string-->
+    <string name="filter_pending">Pending</string>
+    <string name="filter_active">Active</string>
+    <string name="filter_suspended">Suspended</string>
+
+    <!-- Status & Roles (mapped from DB) -->
+    <string name="status_pending">PENDING</string>
+    <string name="status_active">ACTIVE</string>
+    <string name="status_suspended">SUSPENDED</string>
+    <string name="role_buyer">buyer</string>
+    <string name="role_seller">seller</string>
+    <string name="role_admin">admin</string>
+
+    <!-- Admin Detail Sheet -->
+    <string name="admin_status_label">Status:</string>
+    <string name="admin_btn_verify">Verify User</string>
+    <string name="admin_role_label">Role</string>
+    <string name="admin_btn_save_role">Save Role</string>
+    <string name="admin_btn_reset_pwd">Reset Password</string>
+    <string name="admin_btn_delete_user">Delete User</string>
+
+    <!-- Admin Dialogs -->
+    <string name="admin_delete_title">Delete user?</string>
+    <string name="admin_delete_msg">\"%1$s\" and all their listings, cart items, and transactions will be permanently deleted.</string>
+    <string name="admin_reset_title">Reset password</string>
+    <string name="admin_reset_msg">Set a new password for @%1$s:</string>
+    <string name="admin_field_new_pwd">New password</string>
+    <string name="admin_reset_hint">Minimum 6 characters.</string>
+    <string name="admin_btn_reset">Reset</string>
+
 </resources>

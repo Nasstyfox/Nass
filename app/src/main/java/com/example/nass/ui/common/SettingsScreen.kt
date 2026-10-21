@@ -1,6 +1,7 @@
 package com.example.nass.ui.common
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,24 +11,25 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.nass.data.model.MessageResponse
+import com.example.nass.R
 import com.example.nass.data.model.ProfileUser
 import com.example.nass.data.remote.RetrofitClient
 import com.example.nass.data.repository.ProfileRepository
@@ -119,6 +121,9 @@ fun SettingsScreen(
 
     var displayName by remember { mutableStateOf("") }
     var showPasswordDialog by remember { mutableStateOf(false) }
+
+    // Language State - checks current app locale
+    val currentLocale = AppCompatDelegate.getApplicationLocales().toLanguageTags().ifEmpty { "en" }
 
     // Sync displayName field whenever profile loads
     LaunchedEffect(profileState) {
@@ -217,10 +222,49 @@ fun SettingsScreen(
             )
         }
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(24.dp))
+
+        // ==========================================
+        // ---- LANGUAGE SELECTION BUTTONS ----
+        // ==========================================
+        val activity = context as? android.app.Activity
+
+        Text("Language / Taal / Ulimi", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(
+                selected = currentLocale.startsWith("en"),
+                onClick = {
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
+                    activity?.recreate() // Forces the screen to refresh instantly
+                },
+                label = { Text("English") }
+            )
+            FilterChip(
+                selected = currentLocale.startsWith("af"),
+                onClick = {
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("af"))
+                    activity?.recreate()
+                },
+                label = { Text("Afrikaans") }
+            )
+            FilterChip(
+                selected = currentLocale.startsWith("zu"),
+                onClick = {
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("zu"))
+                    activity?.recreate()
+                },
+                label = { Text("isiZulu") }
+            )
+        }
+        // ==========================================
 
         // ---- Display Name ----
-        Text("Display name", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.display_name), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(6.dp))
         OutlinedTextField(
             value = displayName,
@@ -239,7 +283,7 @@ fun SettingsScreen(
         ) {
             Icon(Icons.Default.Save, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            Text("Save Display Name")
+            Text(stringResource(R.string.save_display_name))
         }
 
         Spacer(Modifier.height(28.dp))
@@ -254,7 +298,7 @@ fun SettingsScreen(
         ) {
             Icon(Icons.Default.Lock, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            Text("Change Password")
+            Text(stringResource(R.string.change_password))
         }
 
         Spacer(Modifier.height(12.dp))
@@ -270,7 +314,7 @@ fun SettingsScreen(
         ) {
             Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            Text("Logout")
+            Text(stringResource(R.string.logout))
         }
 
         Spacer(Modifier.height(24.dp))

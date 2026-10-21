@@ -18,12 +18,14 @@ import com.example.nass.ui.buyer.tabs.HistoryTab
 import com.example.nass.ui.common.SettingsScreen
 import com.example.nass.util.Resource
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
+import com.example.nass.R
 
-private enum class BuyerTab(val label: String) {
-    BROWSE("Browse"),
-    CART("Cart"),
-    HISTORY("History"),
-    PROFILE("Profile")
+private enum class BuyerTab(val labelRes: Int) {
+    BROWSE(R.string.tab_browse),
+    CART(R.string.tab_cart),
+    HISTORY(R.string.tab_history),
+    PROFILE(R.string.tab_profile)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,13 +42,15 @@ fun BuyerDashboardScreen(onLogout: () -> Unit) {
     val cartState by vm.cart.collectAsStateWithLifecycle()
     val cartCount = (cartState as? Resource.Success)?.data?.size ?: 0
 
-    val username by SessionStore.from(context).usernameFlow.collectAsState(initial = "")
+    // Assuming you have the username available somewhere, or just use the tab title
+    // If you have a user session, replace "Buyer" with the actual username if you want
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Welcome ${username ?: ""}") },
+                // Translates "Buyer — Browse" etc.
+                title = { Text(stringResource(R.string.buyer_title, stringResource(currentTab.labelRes))) },
                 actions = {
                     IconButton(onClick = onLogout) {
                         Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout")
@@ -62,13 +66,8 @@ fun BuyerDashboardScreen(onLogout: () -> Unit) {
                         onClick = { currentTab = tab },
                         icon = {
                             if (tab == BuyerTab.CART && cartCount > 0) {
-                                BadgedBox(
-                                    badge = { Badge { Text(cartCount.toString()) } }
-                                ) {
-                                    Icon(
-                                        Icons.Default.ShoppingCart,
-                                        contentDescription = tab.label
-                                    )
+                                BadgedBox(badge = { Badge { Text(cartCount.toString()) } }) {
+                                    Icon(Icons.Default.ShoppingCart, contentDescription = null)
                                 }
                             } else {
                                 Icon(
@@ -78,20 +77,19 @@ fun BuyerDashboardScreen(onLogout: () -> Unit) {
                                         BuyerTab.HISTORY -> Icons.Default.Receipt
                                         BuyerTab.PROFILE -> Icons.Default.Person
                                     },
-                                    contentDescription = tab.label
+                                    contentDescription = null
                                 )
                             }
                         },
-                        label = { Text(tab.label) }
+                        // Translates the tab label
+                        label = { Text(stringResource(tab.labelRes)) }
                     )
                 }
             }
         }
     ) { padding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier.fillMaxSize().padding(padding)
         ) {
             when (currentTab) {
                 BuyerTab.BROWSE -> BrowseTab(
@@ -101,15 +99,12 @@ fun BuyerDashboardScreen(onLogout: () -> Unit) {
                 BuyerTab.CART -> CartTab(
                     vm = vm,
                     onGoToBrowse = { currentTab = BuyerTab.BROWSE },
-                    onMessage = { msg ->
-                        scope.launch { snackbarHostState.showSnackbar(msg) }
-                    }
+                    onMessage = { msg -> scope.launch { snackbarHostState.showSnackbar(msg) } }
                 )
                 BuyerTab.HISTORY -> HistoryTab(
                     vm = vm,
                     onGoToBrowse = { currentTab = BuyerTab.BROWSE }
                 )
-                //BuyerTab.PROFILE -> PlaceholderTab("Profile will be built near the end")
                 BuyerTab.PROFILE -> SettingsScreen(
                     onLogout = onLogout,
                     onMessage = { msg -> scope.launch { snackbarHostState.showSnackbar(msg) } }
@@ -127,7 +122,6 @@ fun BuyerDashboardScreen(onLogout: () -> Unit) {
         )
     }
 }
-
 @Composable
 private fun PlaceholderTab(text: String) {
     Box(

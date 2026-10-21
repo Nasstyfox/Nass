@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.nass.R
 import com.example.nass.data.model.CreateProductRequest
 import com.example.nass.data.model.Product
 import com.example.nass.ui.seller.SellerViewModel
@@ -53,13 +55,10 @@ fun EditProductSheet(
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // Pre-fill from product — keyed on id so switching products refreshes fields
     var name by remember(product.id) { mutableStateOf(product.name) }
     var description by remember(product.id) { mutableStateOf(product.description ?: "") }
     var priceText by remember(product.id) {
-        mutableStateOf(
-            if (product.price == 0.0) "" else String.format(Locale.US, "%.2f", product.price)
-        )
+        mutableStateOf(if (product.price == 0.0) "" else String.format(Locale.US, "%.2f", product.price))
     }
     var category by remember(product.id) { mutableStateOf(product.category) }
     var imageUrl by remember(product.id) { mutableStateOf(product.imageUrl ?: "") }
@@ -73,158 +72,82 @@ fun EditProductSheet(
     val isUploading = uploadState is Resource.Loading
     val isBusy = isUpdating || isDeleting || isUploading
 
-    // ---- Image picker launcher ----
-    val pickImage = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
+    val pickImage = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
         if (uri != null) vm.uploadProductImage(context, uri)
     }
 
-    // ---- React to upload result ----
     LaunchedEffect(uploadState) {
         when (val s = uploadState) {
-            is Resource.Success -> {
-                imageUrl = s.data
-                vm.clearImageUpload()
-            }
-            is Resource.Error -> {
-                onMessage(s.message)
-                vm.clearImageUpload()
-            }
+            is Resource.Success -> { imageUrl = s.data; vm.clearImageUpload() }
+            is Resource.Error -> { onMessage(s.message); vm.clearImageUpload() }
             else -> Unit
         }
     }
 
-    // ---- React to update result ----
     LaunchedEffect(updateState) {
         when (val s = updateState) {
-            is Resource.Success -> {
-                onMessage("Listing updated")
-                vm.cancelEdit()
-            }
-            is Resource.Error -> {
-                onMessage(s.message)
-                vm.clearUpdateState()
-            }
+            is Resource.Success -> { onMessage(context.getString(R.string.msg_listing_updated)); vm.cancelEdit() }
+            is Resource.Error -> { onMessage(s.message); vm.clearUpdateState() }
             else -> Unit
         }
     }
 
-    // ---- React to delete result ----
     LaunchedEffect(deleteState) {
         when (val s = deleteState) {
-            is Resource.Success -> {
-                showDeleteDialog = false
-                onMessage("Listing deleted")
-                vm.cancelEdit()
-            }
-            is Resource.Error -> {
-                onMessage(s.message)
-                vm.clearDeleteState()
-            }
+            is Resource.Success -> { showDeleteDialog = false; onMessage(context.getString(R.string.msg_listing_deleted)); vm.cancelEdit() }
+            is Resource.Error -> { onMessage(s.message); vm.clearDeleteState() }
             else -> Unit
         }
     }
 
-    ModalBottomSheet(
-        onDismissRequest = { if (!isBusy) onDismiss() },
-        sheetState = sheetState
-    ) {
+    ModalBottomSheet(onDismissRequest = { if (!isBusy) onDismiss() }, sheetState = sheetState) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 24.dp)
+            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp)
         ) {
-            // ---- Header ----
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.weight(1f)) {
-                    Text("Edit listing", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-                    Text(
-                        "Update the details below",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Text(stringResource(R.string.edit_title), fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.edit_subtitle), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                IconButton(
-                    onClick = { if (!isBusy) onDismiss() },
-                    enabled = !isBusy
-                ) {
-                    Icon(Icons.Default.Close, contentDescription = "Close")
+                IconButton(onClick = { if (!isBusy) onDismiss() }, enabled = !isBusy) {
+                    Icon(Icons.Default.Close, contentDescription = null)
                 }
             }
 
             Spacer(Modifier.height(12.dp))
 
-            // ---- Image preview ----
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 if (imageUrl.isNotBlank() && imageUrl.startsWith("http")) {
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = "Preview",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    IconButton(
-                        onClick = { imageUrl = "" },
-                        enabled = !isBusy,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(4.dp)
-                    ) {
-                        Surface(
-                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
-                            shape = RoundedCornerShape(50)
-                        ) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Remove image",
-                                modifier = Modifier.padding(6.dp)
-                            )
+                    AsyncImage(model = imageUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                    IconButton(onClick = { imageUrl = "" }, enabled = !isBusy, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)) {
+                        Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f), shape = RoundedCornerShape(50)) {
+                            Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.padding(6.dp))
                         }
                     }
                 } else if (isUploading) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator()
                         Spacer(Modifier.height(8.dp))
-                        Text("Uploading image…", fontSize = 12.sp)
+                        Text(stringResource(R.string.image_uploading), fontSize = 12.sp)
                     }
                 } else {
-                    Icon(
-                        imageVector = Icons.Default.Image,
-                        contentDescription = null,
-                        modifier = Modifier.size(44.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(44.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
             Spacer(Modifier.height(10.dp))
 
-            // ---- Image picker button ----
             OutlinedButton(
-                onClick = {
-                    pickImage.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    )
-                },
+                onClick = { pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                 enabled = !isBusy,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Default.PhotoCamera, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text(if (imageUrl.isBlank()) "Add image from phone" else "Change image")
+                Text(stringResource(if (imageUrl.isBlank()) R.string.image_add_btn else R.string.image_change_btn))
             }
 
             Spacer(Modifier.height(20.dp))
@@ -232,7 +155,7 @@ fun EditProductSheet(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Item name *") },
+                label = { Text(stringResource(R.string.field_item_name)) },
                 singleLine = true,
                 enabled = !isBusy,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -244,7 +167,7 @@ fun EditProductSheet(
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Description") },
+                label = { Text(stringResource(R.string.field_description)) },
                 minLines = 3,
                 maxLines = 5,
                 enabled = !isBusy,
@@ -255,23 +178,13 @@ fun EditProductSheet(
 
             OutlinedTextField(
                 value = priceText,
-                onValueChange = { input ->
-                    if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
-                        priceText = input
-                    }
-                },
-                label = { Text("Price (R) *") },
+                onValueChange = { input -> if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d{0,2}$"))) priceText = input },
+                label = { Text(stringResource(R.string.field_price)) },
                 singleLine = true,
                 enabled = !isBusy,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Next
-                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next),
                 isError = priceText.isNotEmpty() && priceValue == null,
-                supportingText = {
-                    if (priceText.isNotEmpty() && priceValue == null)
-                        Text("Enter a valid number")
-                },
+                supportingText = { if (priceText.isNotEmpty() && priceValue == null) Text(stringResource(R.string.field_price_error)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -281,26 +194,36 @@ fun EditProductSheet(
                 expanded = categoryExpanded,
                 onExpandedChange = { if (!isBusy) categoryExpanded = !categoryExpanded }
             ) {
+                val visualCategory = when(category) {
+                    "Clothing" -> stringResource(R.string.cat_clothing)
+                    "Shoes" -> stringResource(R.string.cat_shoes)
+                    "Accessories" -> stringResource(R.string.cat_accessories)
+                    "Bags" -> stringResource(R.string.cat_bags)
+                    "Other" -> stringResource(R.string.cat_other)
+                    else -> category
+                }
+
                 OutlinedTextField(
-                    value = category,
+                    value = visualCategory,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Category") },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded)
-                    },
+                    label = { Text(stringResource(R.string.field_category)) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
                     enabled = !isBusy,
-                    modifier = Modifier
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                        .fillMaxWidth()
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
                 )
-                ExposedDropdownMenu(
-                    expanded = categoryExpanded,
-                    onDismissRequest = { categoryExpanded = false }
-                ) {
+                ExposedDropdownMenu(expanded = categoryExpanded, onDismissRequest = { categoryExpanded = false }) {
                     CATEGORIES.forEach { c ->
+                        val menuText = when(c) {
+                            "Clothing" -> stringResource(R.string.cat_clothing)
+                            "Shoes" -> stringResource(R.string.cat_shoes)
+                            "Accessories" -> stringResource(R.string.cat_accessories)
+                            "Bags" -> stringResource(R.string.cat_bags)
+                            "Other" -> stringResource(R.string.cat_other)
+                            else -> c
+                        }
                         DropdownMenuItem(
-                            text = { Text(c) },
+                            text = { Text(menuText) },
                             onClick = { category = c; categoryExpanded = false }
                         )
                     }
@@ -309,7 +232,6 @@ fun EditProductSheet(
 
             Spacer(Modifier.height(24.dp))
 
-            // ---- Update button ----
             Button(
                 onClick = {
                     val req = CreateProductRequest(
@@ -325,65 +247,51 @@ fun EditProductSheet(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (isUpdating) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
                 } else {
                     Icon(Icons.Default.Save, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Save Changes")
+                    Text(stringResource(R.string.btn_save_changes))
                 }
             }
 
             Spacer(Modifier.height(8.dp))
 
-            // ---- Delete button ----
             OutlinedButton(
                 onClick = { showDeleteDialog = true },
                 enabled = !isBusy,
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.error
-                ),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Default.Delete, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Delete Listing")
+                Text(stringResource(R.string.btn_delete_listing))
             }
         }
     }
 
-    // ---- Delete confirmation dialog ----
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { if (!isDeleting) showDeleteDialog = false },
-            title = { Text("Delete listing?") },
-            text = { Text("\"${product.name}\" will be permanently removed. This can't be undone.") },
+            title = { Text(stringResource(R.string.dialog_delete_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_msg, product.name)) },
             confirmButton = {
                 TextButton(
                     onClick = { vm.deleteProduct(product.id) },
                     enabled = !isDeleting,
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
-                    )
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
                     if (isDeleting) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp
-                        )
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                     } else {
-                        Text("Delete")
+                        Text(stringResource(R.string.btn_delete))
                     }
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { showDeleteDialog = false },
-                    enabled = !isDeleting
-                ) { Text("Cancel") }
+                TextButton(onClick = { showDeleteDialog = false }, enabled = !isDeleting) {
+                    Text(stringResource(R.string.btn_cancel))
+                }
             }
         )
     }

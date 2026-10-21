@@ -108,4 +108,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+
+    //Support for multi-language
+    implementation(libs.androidx.appcompat)
 }

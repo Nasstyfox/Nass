@@ -14,10 +14,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.nass.R
 import com.example.nass.data.model.SellerStats
 import com.example.nass.ui.seller.SellerViewModel
 import com.example.nass.util.Resource
@@ -33,13 +35,13 @@ fun StatsTab(vm: SellerViewModel) {
             .padding(16.dp)
     ) {
         Text(
-            text = "Your selling overview",
+            text = stringResource(R.string.stats_title),
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            text = "Live counts from your listings",
+            text = stringResource(R.string.stats_subtitle),
             fontSize = 13.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -64,7 +66,7 @@ private fun LoadingBlock() {
     ) {
         CircularProgressIndicator()
         Spacer(Modifier.height(12.dp))
-        Text("Loading your stats…", fontSize = 13.sp)
+        Text(stringResource(R.string.stats_loading), fontSize = 13.sp)
     }
 }
 
@@ -78,7 +80,7 @@ private fun ErrorBlock(message: String, onRetry: () -> Unit) {
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(
-                text = "Couldn't load stats",
+                text = stringResource(R.string.stats_error),
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
@@ -92,7 +94,7 @@ private fun ErrorBlock(message: String, onRetry: () -> Unit) {
             Button(onClick = onRetry) {
                 Icon(Icons.Default.Refresh, contentDescription = null)
                 Spacer(Modifier.width(6.dp))
-                Text("Retry")
+                Text(stringResource(R.string.btn_retry))
             }
         }
     }
@@ -102,21 +104,21 @@ private fun ErrorBlock(message: String, onRetry: () -> Unit) {
 private fun StatsContent(stats: SellerStats, onRefresh: () -> Unit) {
     Column {
         StatCard(
-            title = "Total Added",
+            title = stringResource(R.string.stats_total_added),
             value = stats.totalAdded,
             icon = Icons.Default.Inventory2,
             tint = MaterialTheme.colorScheme.primary
         )
         Spacer(Modifier.height(12.dp))
         StatCard(
-            title = "Total Sold",
+            title = stringResource(R.string.stats_total_sold),
             value = stats.totalSold,
             icon = Icons.Default.Sell,
             tint = MaterialTheme.colorScheme.tertiary
         )
         Spacer(Modifier.height(12.dp))
         StatCard(
-            title = "Available for Sale",
+            title = stringResource(R.string.stats_available),
             value = stats.available,
             icon = Icons.Default.CheckCircle,
             tint = MaterialTheme.colorScheme.secondary
@@ -130,7 +132,7 @@ private fun StatsContent(stats: SellerStats, onRefresh: () -> Unit) {
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            Text("Refresh")
+            Text(stringResource(R.string.btn_refresh))
         }
     }
 }

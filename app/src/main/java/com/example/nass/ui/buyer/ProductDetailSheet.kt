@@ -16,11 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.nass.R
 import com.example.nass.data.model.Product
 import com.example.nass.util.Formatters
 import com.example.nass.util.Resource
@@ -37,11 +39,14 @@ fun ProductDetailSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isLoading = addState is Resource.Loading
 
+    // 1. Fetch the string OUTSIDE the coroutine scope
+    val addedToCartMessage = stringResource(R.string.msg_added_to_cart)
+
     // React to add-to-cart result
     LaunchedEffect(addState) {
         when (val s = addState) {
             is Resource.Success -> {
-                onMessage(s.data.message ?: "Added to cart")
+                onMessage(addedToCartMessage)
                 vm.clearAddToCartState()
                 onDismiss()
             }
@@ -70,7 +75,7 @@ fun ProductDetailSheet(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = product.category,
+                    text = product.category, // DB Category
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f)
@@ -79,7 +84,7 @@ fun ProductDetailSheet(
                     onClick = { if (!isLoading) onDismiss() },
                     enabled = !isLoading
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = "Close")
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.btn_cancel))
                 }
             }
 
@@ -113,7 +118,7 @@ fun ProductDetailSheet(
 
             // Name
             Text(
-                text = product.name,
+                text = product.name, // DB Name
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -130,7 +135,7 @@ fun ProductDetailSheet(
                     )
                     Spacer(Modifier.width(4.dp))
                     Text(
-                        text = "Sold by ${product.sellerUsername}",
+                        text = stringResource(R.string.sold_by, product.sellerUsername),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -150,13 +155,13 @@ fun ProductDetailSheet(
             if (!product.description.isNullOrBlank()) {
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    text = "Description",
+                    text = stringResource(R.string.product_description),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = product.description,
+                    text = product.description, // DB Description
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -181,7 +186,7 @@ fun ProductDetailSheet(
                 } else {
                     Icon(Icons.Default.AddShoppingCart, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Add to Cart", fontSize = 16.sp)
+                    Text(stringResource(R.string.btn_add_to_cart), fontSize = 16.sp)
                 }
             }
         }

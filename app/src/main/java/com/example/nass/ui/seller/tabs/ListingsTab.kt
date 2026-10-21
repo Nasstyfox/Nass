@@ -1,5 +1,6 @@
 package com.example.nass.ui.seller.tabs
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,22 +17,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.nass.R
 import com.example.nass.data.model.Product
 import com.example.nass.ui.seller.SellerViewModel
-import com.example.nass.util.Resource
-import java.util.Locale
 import com.example.nass.util.Formatters
+import com.example.nass.util.Resource
 
-private enum class ListingFilter(val label: String) {
-    ALL("All"),
-    AVAILABLE("Available"),
-    SOLD("Sold")
+private enum class ListingFilter(@StringRes val labelRes: Int) {
+    ALL(R.string.filter_all),
+    AVAILABLE(R.string.filter_available),
+    SOLD(R.string.filter_sold)
 }
 
 @Composable
@@ -56,19 +58,22 @@ fun ListingsTab(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f)) {
-                Text("My Listings", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.listings_title), fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
                 Text(
                     text = when (val s = state) {
-                        is Resource.Success ->
-                            "${s.data.size} item${if (s.data.size == 1) "" else "s"}"
-                        else -> "Loading…"
+                        is Resource.Success -> if (s.data.size == 1) {
+                            stringResource(R.string.listings_count_single, s.data.size)
+                        } else {
+                            stringResource(R.string.listings_count, s.data.size)
+                        }
+                        else -> stringResource(R.string.listings_loading)
                     },
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             IconButton(onClick = { vm.loadProducts() }) {
-                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                Icon(Icons.Default.Refresh, contentDescription = null)
             }
         }
 
@@ -80,7 +85,7 @@ fun ListingsTab(
                     FilterChip(
                         selected = filter == f,
                         onClick = { filter = f },
-                        label = { Text(f.label) }
+                        label = { Text(stringResource(f.labelRes)) }
                     )
                 }
             }
@@ -89,9 +94,7 @@ fun ListingsTab(
 
         when (val s = state) {
             is Resource.Idle, is Resource.Loading -> LoadingBlock()
-
             is Resource.Error -> ErrorBlock(s.message) { vm.loadProducts() }
-
             is Resource.Success -> {
                 if (s.data.isEmpty()) {
                     EmptyState()
@@ -122,42 +125,34 @@ fun ListingsTab(
 @Composable
 private fun LoadingBlock() {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 48.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator()
         Spacer(Modifier.height(12.dp))
-        Text("Loading your listings…", fontSize = 13.sp)
+        Text(stringResource(R.string.listings_loading), fontSize = 13.sp)
     }
 }
 
 @Composable
 private fun ErrorBlock(message: String, onRetry: () -> Unit) {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(
-                text = "Couldn't load listings",
+                text = stringResource(R.string.listings_error),
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
             Spacer(Modifier.height(4.dp))
-            Text(
-                text = message,
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onErrorContainer
-            )
+            Text(text = message, fontSize = 13.sp, color = MaterialTheme.colorScheme.onErrorContainer)
             Spacer(Modifier.height(12.dp))
             Button(onClick = onRetry) {
                 Icon(Icons.Default.Refresh, contentDescription = null)
                 Spacer(Modifier.width(6.dp))
-                Text("Retry")
+                Text(stringResource(R.string.btn_retry))
             }
         }
     }
@@ -165,10 +160,7 @@ private fun ErrorBlock(message: String, onRetry: () -> Unit) {
 
 @Composable
 private fun EmptyState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 imageVector = Icons.Default.Inventory2,
@@ -177,10 +169,10 @@ private fun EmptyState() {
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(12.dp))
-            Text("No listings yet", fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.listings_empty_title), fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(4.dp))
             Text(
-                "Tap the Add tab to post your first item",
+                stringResource(R.string.listings_empty_sub),
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -191,13 +183,11 @@ private fun EmptyState() {
 @Composable
 private fun FilterEmptyState(filter: ListingFilter) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 48.dp),
+        modifier = Modifier.fillMaxSize().padding(top = 48.dp),
         contentAlignment = Alignment.TopCenter
     ) {
         Text(
-            text = "No ${filter.label.lowercase()} items",
+            text = stringResource(R.string.listings_filter_empty, stringResource(filter.labelRes).lowercase()),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -206,24 +196,13 @@ private fun FilterEmptyState(filter: ListingFilter) {
 @Composable
 private fun ListingCard(product: Product, onClick: () -> Unit) {
     val isSold = product.isSold == 1
-
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surface),
+                modifier = Modifier.size(80.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
                 if (!product.imageUrl.isNullOrBlank()) {
@@ -242,39 +221,23 @@ private fun ListingCard(product: Product, onClick: () -> Unit) {
                     )
                 }
             }
-
             Spacer(Modifier.width(12.dp))
-
             Column(Modifier.weight(1f)) {
-                Text(
-                    text = product.name,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Text(text = product.name, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(2.dp))
-                Text(
-                    text = product.category,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Text(text = product.category, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    //text = String.format(Locale.US, "R %.2f", product.price),
-                    text =Formatters.price(product.price),
+                    text = Formatters.price(product.price),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-
             if (isSold) {
-                Surface(
-                    color = MaterialTheme.colorScheme.tertiary,
-                    shape = RoundedCornerShape(6.dp)
-                ) {
+                Surface(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(6.dp)) {
                     Text(
-                        text = "SOLD",
+                        text = stringResource(R.string.badge_sold),
                         color = MaterialTheme.colorScheme.onTertiary,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,

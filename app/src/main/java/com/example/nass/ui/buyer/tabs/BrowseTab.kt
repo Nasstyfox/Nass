@@ -18,12 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.nass.R
 import com.example.nass.data.model.Product
 import com.example.nass.ui.buyer.BuyerViewModel
 import com.example.nass.util.Formatters
@@ -46,18 +48,22 @@ fun BrowseTab(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f)) {
-                Text("Browse", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.browse_title), fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
                 Text(
                     text = when (val s = state) {
-                        is Resource.Success -> Formatters.plural(s.data.size, "item")
-                        else -> "Loading…"
+                        is Resource.Success -> if (s.data.size == 1) {
+                            "1 ${stringResource(R.string.item_singular)}"
+                        } else {
+                            "${s.data.size} ${stringResource(R.string.item_plural)}"
+                        }
+                        else -> stringResource(R.string.loading)
                     },
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             IconButton(onClick = { vm.loadAvailable() }) {
-                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.btn_refresh))
             }
         }
 
@@ -97,7 +103,6 @@ private fun ProductGridCard(product: Product, onClick: () -> Unit) {
         )
     ) {
         Column {
-            // Image
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -122,10 +127,9 @@ private fun ProductGridCard(product: Product, onClick: () -> Unit) {
                 }
             }
 
-            // Details
             Column(Modifier.padding(10.dp)) {
                 Text(
-                    text = product.name,
+                    text = product.name, // DB Name
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
                     maxLines = 1,
@@ -133,7 +137,8 @@ private fun ProductGridCard(product: Product, onClick: () -> Unit) {
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = product.sellerUsername?.let { "by $it" } ?: product.category,
+                    // Translates "by {username}"
+                    text = product.sellerUsername?.let { stringResource(R.string.by_seller, it) } ?: product.category,
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -154,42 +159,34 @@ private fun ProductGridCard(product: Product, onClick: () -> Unit) {
 @Composable
 private fun LoadingBlock() {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 48.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator()
         Spacer(Modifier.height(12.dp))
-        Text("Loading listings…", fontSize = 13.sp)
+        Text(stringResource(R.string.browse_loading), fontSize = 13.sp)
     }
 }
 
 @Composable
 private fun ErrorBlock(message: String, onRetry: () -> Unit) {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(
-                "Couldn't load listings",
+                stringResource(R.string.browse_error),
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
             Spacer(Modifier.height(4.dp))
-            Text(
-                message,
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onErrorContainer
-            )
+            Text(message, fontSize = 13.sp, color = MaterialTheme.colorScheme.onErrorContainer)
             Spacer(Modifier.height(12.dp))
             Button(onClick = onRetry) {
                 Icon(Icons.Default.Refresh, contentDescription = null)
                 Spacer(Modifier.width(6.dp))
-                Text("Retry")
+                Text(stringResource(R.string.btn_retry))
             }
         }
     }
@@ -197,10 +194,7 @@ private fun ErrorBlock(message: String, onRetry: () -> Unit) {
 
 @Composable
 private fun EmptyState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 imageVector = Icons.Default.Storefront,
@@ -209,10 +203,10 @@ private fun EmptyState() {
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(12.dp))
-            Text("Nothing for sale yet", fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.browse_empty_title), fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(4.dp))
             Text(
-                "Check back soon",
+                stringResource(R.string.browse_empty_sub),
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
