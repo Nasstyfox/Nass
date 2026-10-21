@@ -252,9 +252,9 @@ app/src/main/java/com/example/nass/
 
 ## Demo Video
 
-
-https://youtu.be/OffGekhINTo 
-
+```text
+//url for video
+```
 
 ## AI Tool Usage
 
