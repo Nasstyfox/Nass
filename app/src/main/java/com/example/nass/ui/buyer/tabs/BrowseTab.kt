@@ -1,5 +1,8 @@
 package com.example.nass.ui.buyer.tabs
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -43,7 +46,6 @@ fun BrowseTab(
     val state by vm.available.collectAsStateWithLifecycle()
     val favorites by vm.favorites.collectAsStateWithLifecycle()
 
-    // Load favorites from Firestore when the tab opens
     LaunchedEffect(Unit) {
         vm.loadFavorites(context)
     }
@@ -86,6 +88,25 @@ fun BrowseTab(
             is Resource.Idle, is Resource.Loading -> LoadingBlock()
             is Resource.Error -> ErrorBlock(s.message) { vm.loadAvailable() }
             is Resource.Success -> {
+
+                // --- OFFLINE MODE BANNER ---
+                if (!isNetworkAvailable(context)) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Text(
+                            text = "Offline Mode: Showing cached data",
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                }
+                // ---------------------------
+
                 if (s.data.isEmpty()) {
                     EmptyState()
                 } else {
@@ -149,7 +170,6 @@ private fun ProductGridCard(
                     )
                 }
 
-                // Heart Icon Overlay
                 IconButton(
                     onClick = onFavoriteToggle,
                     modifier = Modifier
@@ -198,7 +218,19 @@ private fun ProductGridCard(
     }
 }
 
-// --- Keep your existing LoadingBlock, ErrorBlock, and EmptyState functions below ---
+// --- Helper to check Network Status ---
+private fun isNetworkAvailable(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+    return when {
+        activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+        activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+        activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+        else -> false
+    }
+}
+
 @Composable
 private fun LoadingBlock() {
     Column(

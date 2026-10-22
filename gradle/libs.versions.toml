@@ -21,7 +21,7 @@ appcompat = "1.7.0"
 googleServices = "4.4.2"
 firebaseBom = "33.5.1"
 playServicesAuth = "21.2.0"
-room = "2.6.1"
+room = "2.7.0"
 ksp = "2.2.10-2.0.2"  # Use the KSP version that matches your Kotlin version 2.2.10
 
 [libraries]

@@ -1,5 +1,6 @@
 package com.example.nass.data.repository
 
+import com.example.nass.data.local.NassDao
 import com.example.nass.data.model.AddToCartRequest
 import com.example.nass.data.model.AddToCartResponse
 import com.example.nass.data.model.CartItem
@@ -11,14 +12,42 @@ import com.example.nass.util.Resource
 import com.google.gson.Gson
 import retrofit2.Response
 
-class CartRepository(private val api: ApiService) {
+class CartRepository(
+    private val api: ApiService,
+    private val dao: NassDao // <-- Added DAO
+) {
 
     private val tag = "CartRepo"
     private val gson = Gson()
 
     suspend fun getCart(): Resource<List<CartItem>> {
         Logger.d(tag, "getCart()")
-        return safeCall("getCart") { api.getCart() }
+        return try {
+            val response = api.getCart()
+            if (response.isSuccessful && response.body() != null) {
+                val cart = response.body()!!
+                // SYNC: Save to RoomDB
+                dao.clearCart()
+                dao.insertCart(cart)
+                Logger.d(tag, "getCart ok -> cached ${cart.size} items")
+                Resource.Success(cart)
+            } else {
+                Resource.Error("Error ${response.code()}", response.code())
+            }
+        } catch (e: Exception) {
+            Logger.e(tag, "getCart exception, loading from cache", e)
+            // OFFLINE MODE: Load from RoomDB
+            try {
+                val cached = dao.getCachedCart()
+                if (cached.isNotEmpty()) {
+                    Resource.Success(cached)
+                } else {
+                    Resource.Error("No internet and no cached cart available.")
+                }
+            } catch (dbError: Exception) {
+                Resource.Error("Network error and cache failed.")
+            }
+        }
     }
 
     suspend fun addToCart(productId: Int): Resource<AddToCartResponse> {

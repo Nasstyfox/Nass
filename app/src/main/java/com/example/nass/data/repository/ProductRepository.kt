@@ -1,5 +1,6 @@
 package com.example.nass.data.repository
 
+import com.example.nass.data.local.NassDao
 import com.example.nass.data.model.CreateProductRequest
 import com.example.nass.data.model.Product
 import com.example.nass.data.remote.ApiService
@@ -7,13 +8,42 @@ import com.example.nass.util.Logger
 import com.example.nass.util.Resource
 import retrofit2.Response
 
-class ProductRepository(private val api: ApiService) {
+class ProductRepository(
+    private val api: ApiService,
+    private val dao: NassDao // <-- Added DAO
+) {
 
     private val tag = "ProductRepo"
 
     suspend fun getAvailable(): Resource<List<Product>> {
         Logger.d(tag, "getAvailable()")
-        return safeCall("getAvailable") { api.getAvailableProducts() }
+        return try {
+            val response = api.getAvailableProducts()
+            if (response.isSuccessful && response.body() != null) {
+                val products = response.body()!!
+                // SYNC: Save fresh data to RoomDB
+                dao.clearProducts()
+                dao.insertProducts(products)
+                Logger.d(tag, "getAvailable ok -> cached ${products.size} items")
+                Resource.Success(products)
+            } else {
+                Resource.Error("Error ${response.code()}", response.code())
+            }
+        } catch (e: Exception) {
+            Logger.e(tag, "getAvailable exception, loading from cache", e)
+            // OFFLINE MODE: Load from RoomDB
+            try {
+                val cached = dao.getCachedProducts()
+                if (cached.isNotEmpty()) {
+                    Logger.i(tag, "Loaded ${cached.size} products from RoomDB cache")
+                    Resource.Success(cached)
+                } else {
+                    Resource.Error("No internet and no cached data available.")
+                }
+            } catch (dbError: Exception) {
+                Resource.Error("Network error and cache failed.")
+            }
+        }
     }
 
     suspend fun create(req: CreateProductRequest): Resource<Product> {

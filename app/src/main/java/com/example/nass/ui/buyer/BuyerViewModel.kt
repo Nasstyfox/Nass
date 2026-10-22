@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.nass.data.local.NassDatabase
 import com.example.nass.data.local.SessionStore
 import com.example.nass.data.model.AddToCartResponse
 import com.example.nass.data.model.CartItem
@@ -25,7 +26,7 @@ import kotlinx.coroutines.launch
 class BuyerViewModel(
     private val productRepo: ProductRepository,
     private val cartRepo: CartRepository,
-    private val firestoreRepo: FirestoreRepository // <-- Added NoSQL Repo
+    private val firestoreRepo: FirestoreRepository
 ) : ViewModel() {
 
     private val _available = MutableStateFlow<Resource<List<Product>>>(Resource.Idle)
@@ -49,7 +50,6 @@ class BuyerViewModel(
     private val _selectedProduct = MutableStateFlow<Product?>(null)
     val selectedProduct: StateFlow<Product?> = _selectedProduct.asStateFlow()
 
-    // --- Firestore Favorites State ---
     private val _favorites = MutableStateFlow<Set<Int>>(emptySet())
     val favorites: StateFlow<Set<Int>> = _favorites.asStateFlow()
 
@@ -58,16 +58,12 @@ class BuyerViewModel(
         loadCart()
     }
 
-    // ============ Browse ============
-
     fun loadAvailable() {
         viewModelScope.launch {
             _available.value = Resource.Loading
             _available.value = productRepo.getAvailable()
         }
     }
-
-    // ============ Firestore Favorites ============
 
     fun loadFavorites(context: Context) {
         viewModelScope.launch {
@@ -85,14 +81,12 @@ class BuyerViewModel(
             val userId = SessionStore.from(context).currentUserId()?.toString() ?: return@launch
             val isCurrentlyFav = _favorites.value.contains(productId)
 
-            // 1. Optimistic UI update (instant heart toggle)
             _favorites.value = if (isCurrentlyFav) {
                 _favorites.value - productId
             } else {
                 _favorites.value + productId
             }
 
-            // 2. Save to NoSQL DB
             if (isCurrentlyFav) {
                 firestoreRepo.removeFavorite(userId, productId)
             } else {
@@ -100,8 +94,6 @@ class BuyerViewModel(
             }
         }
     }
-
-    // ============ Cart ============
 
     fun loadCart() {
         viewModelScope.launch {
@@ -132,8 +124,6 @@ class BuyerViewModel(
 
     fun clearRemoveFromCartState() { _removeFromCartState.value = Resource.Idle }
 
-    // ============ Checkout ============
-
     fun checkout() {
         viewModelScope.launch {
             _checkoutState.value = Resource.Loading
@@ -149,16 +139,12 @@ class BuyerViewModel(
 
     fun clearCheckoutState() { _checkoutState.value = Resource.Idle }
 
-    // ============ History ============
-
     fun loadHistory() {
         viewModelScope.launch {
             _history.value = Resource.Loading
             _history.value = cartRepo.getHistory()
         }
     }
-
-    // ============ Product detail ============
 
     fun selectProduct(product: Product) { _selectedProduct.value = product }
     fun clearSelectedProduct() { _selectedProduct.value = null }
@@ -167,10 +153,11 @@ class BuyerViewModel(
         fun factory(context: Context) = viewModelFactory {
             initializer {
                 val api = RetrofitClient.getInstance(context)
+                val dao = NassDatabase.getDatabase(context).nassDao() // <-- DB Initialized
                 BuyerViewModel(
-                    productRepo = ProductRepository(api),
-                    cartRepo = CartRepository(api),
-                    firestoreRepo = FirestoreRepository() // <-- Initialized
+                    productRepo = ProductRepository(api, dao),
+                    cartRepo = CartRepository(api, dao),
+                    firestoreRepo = FirestoreRepository()
                 )
             }
         }

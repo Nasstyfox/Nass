@@ -1,9 +1,12 @@
 package com.example.nass.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = "cached_products")
 data class Product(
-    val id: Int = 0,
+    @PrimaryKey val id: Int = 0,
     @SerializedName("seller_id") val sellerId: Int = 0,
     val name: String = "",
     val description: String? = null,

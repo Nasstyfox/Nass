@@ -1,14 +1,17 @@
 package com.example.nass.ui.seller
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.nass.data.local.NassDatabase
 import com.example.nass.data.model.CreateProductRequest
 import com.example.nass.data.model.Product
 import com.example.nass.data.model.SellerStats
 import com.example.nass.data.remote.RetrofitClient
+import com.example.nass.data.repository.ImageRepository
 import com.example.nass.data.repository.ProductRepository
 import com.example.nass.data.repository.SellerRepository
 import com.example.nass.util.Resource
@@ -16,8 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import android.net.Uri
-import com.example.nass.data.repository.ImageRepository
 
 class SellerViewModel(
     private val sellerRepo: SellerRepository,
@@ -33,8 +34,6 @@ class SellerViewModel(
 
     private val _createState = MutableStateFlow<Resource<Product>>(Resource.Idle)
     val createState: StateFlow<Resource<Product>> = _createState.asStateFlow()
-
-    // ---- edit/delete state ----
 
     private val _imageUpload = MutableStateFlow<Resource<String>>(Resource.Idle)
     val imageUpload: StateFlow<Resource<String>> = _imageUpload.asStateFlow()
@@ -52,8 +51,6 @@ class SellerViewModel(
         loadStats()
     }
 
-    // ================= Stats / Listings =================
-
     fun loadStats() {
         viewModelScope.launch {
             _stats.value = Resource.Loading
@@ -68,7 +65,14 @@ class SellerViewModel(
         }
     }
 
-    // ================= Create =================
+    fun uploadProductImage(context: Context, uri: Uri) {
+        viewModelScope.launch {
+            _imageUpload.value = Resource.Loading
+            _imageUpload.value = imageRepo.uploadProductImage(context, uri)
+        }
+    }
+
+    fun clearImageUpload() { _imageUpload.value = Resource.Idle }
 
     fun createProduct(req: CreateProductRequest) {
         viewModelScope.launch {
@@ -83,8 +87,6 @@ class SellerViewModel(
     }
 
     fun clearCreateState() { _createState.value = Resource.Idle }
-
-    // ================= Edit =================
 
     fun startEdit(product: Product) { _editingProduct.value = product }
 
@@ -108,8 +110,6 @@ class SellerViewModel(
 
     fun clearUpdateState() { _updateState.value = Resource.Idle }
 
-    // ================= Delete =================
-
     fun deleteProduct(id: Int) {
         viewModelScope.launch {
             _deleteState.value = Resource.Loading
@@ -123,25 +123,19 @@ class SellerViewModel(
     }
 
     fun clearDeleteState() { _deleteState.value = Resource.Idle }
+
     companion object {
         fun factory(context: Context) = viewModelFactory {
             initializer {
                 val api = RetrofitClient.getInstance(context)
+                val dao = NassDatabase.getDatabase(context).nassDao() // <-- Initialize RoomDB
+
                 SellerViewModel(
                     sellerRepo = SellerRepository(api),
-                    productRepo = ProductRepository(api),
-                    imageRepo = ImageRepository()     // ← add
+                    productRepo = ProductRepository(api, dao), // <-- Pass DAO
+                    imageRepo = ImageRepository()
                 )
             }
         }
     }
-
-    fun uploadProductImage(context: Context, uri: Uri) {
-        viewModelScope.launch {
-            _imageUpload.value = Resource.Loading
-            _imageUpload.value = imageRepo.uploadProductImage(context, uri)
-        }
-    }
-
-    fun clearImageUpload() { _imageUpload.value = Resource.Idle }
 }
