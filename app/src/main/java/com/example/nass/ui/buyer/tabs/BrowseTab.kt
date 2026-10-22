@@ -6,18 +6,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,7 +39,14 @@ fun BrowseTab(
     vm: BuyerViewModel,
     onProductClick: (Product) -> Unit
 ) {
+    val context = LocalContext.current
     val state by vm.available.collectAsStateWithLifecycle()
+    val favorites by vm.favorites.collectAsStateWithLifecycle()
+
+    // Load favorites from Firestore when the tab opens
+    LaunchedEffect(Unit) {
+        vm.loadFavorites(context)
+    }
 
     Column(
         modifier = Modifier
@@ -62,7 +72,10 @@ fun BrowseTab(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            IconButton(onClick = { vm.loadAvailable() }) {
+            IconButton(onClick = {
+                vm.loadAvailable()
+                vm.loadFavorites(context)
+            }) {
                 Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.btn_refresh))
             }
         }
@@ -83,7 +96,12 @@ fun BrowseTab(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(s.data, key = { it.id }) { product ->
-                            ProductGridCard(product, onClick = { onProductClick(product) })
+                            ProductGridCard(
+                                product = product,
+                                isFavorite = favorites.contains(product.id),
+                                onClick = { onProductClick(product) },
+                                onFavoriteToggle = { vm.toggleFavorite(context, product.id) }
+                            )
                         }
                     }
                 }
@@ -93,7 +111,12 @@ fun BrowseTab(
 }
 
 @Composable
-private fun ProductGridCard(product: Product, onClick: () -> Unit) {
+private fun ProductGridCard(
+    product: Product,
+    isFavorite: Boolean,
+    onClick: () -> Unit,
+    onFavoriteToggle: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -125,11 +148,31 @@ private fun ProductGridCard(product: Product, onClick: () -> Unit) {
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+
+                // Heart Icon Overlay
+                IconButton(
+                    onClick = onFavoriteToggle,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                ) {
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "Favorite",
+                            tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(6.dp)
+                        )
+                    }
+                }
             }
 
             Column(Modifier.padding(10.dp)) {
                 Text(
-                    text = product.name, // DB Name
+                    text = product.name,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
                     maxLines = 1,
@@ -137,7 +180,6 @@ private fun ProductGridCard(product: Product, onClick: () -> Unit) {
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    // Translates "by {username}"
                     text = product.sellerUsername?.let { stringResource(R.string.by_seller, it) } ?: product.category,
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -156,6 +198,7 @@ private fun ProductGridCard(product: Product, onClick: () -> Unit) {
     }
 }
 
+// --- Keep your existing LoadingBlock, ErrorBlock, and EmptyState functions below ---
 @Composable
 private fun LoadingBlock() {
     Column(

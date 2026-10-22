@@ -182,4 +182,6 @@
     <string name="admin_reset_hint">Minimum 6 karakters.</string>
     <string name="admin_btn_reset">Herstel</string>
 
+    <string name="login_google">Teken in met Google</string>
+
 </resources>

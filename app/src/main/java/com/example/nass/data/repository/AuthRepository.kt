@@ -71,4 +71,38 @@ class AuthRepository(
             raw.take(180)
         }
     }
+
+    suspend fun googleLogin(idToken: String): Resource<LoginResponse> {
+        Logger.i(tag, "googleLogin()")
+        return try {
+            val response = api.googleLogin(GoogleLoginRequest(idToken))
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+                session.saveSession(
+                    token = body.token,
+                    userId = body.user.userId,
+                    username = body.user.username,
+                    email = body.user.email,
+                    role = body.user.role
+                )
+                Logger.i(tag, "googleLogin success -> role=${body.user.role}")
+                Resource.Success(body)
+            } else {
+                val msg = parseError(response.errorBody()?.string(), response.code())
+                Resource.Error(msg, response.code())
+            }
+        } catch (e: Exception) {
+            Logger.e(tag, "googleLogin exception", e)
+            Resource.Error(e.message ?: "Network error")
+        }
+    }
+
+    suspend fun updateFcmToken(token: String) {
+        try {
+            api.updateFcmToken(mapOf("token" to token))
+            Logger.i(tag, "FCM token synced with backend")
+        } catch (e: Exception) {
+            Logger.e(tag, "Failed to sync FCM token", e)
+        }
+    }
 }

@@ -84,4 +84,14 @@ interface ApiService {
         @Path("id") id: Int,
         @Body body: ResetPasswordRequest
     ): Response<MessageResponse>
+
+    @POST("api/v1/auth/google")
+    suspend fun googleLogin(@Body body: GoogleLoginRequest): Response<LoginResponse>
+
+    @PUT("api/v1/auth/role")
+    suspend fun updateRole(@Body body: UpdateRoleRequest): Response<LoginResponse>
+
+    @PUT("api/v1/auth/fcm-token")
+    suspend fun updateFcmToken(@Body body: Map<String, String>): Response<MessageResponse>
+
 }

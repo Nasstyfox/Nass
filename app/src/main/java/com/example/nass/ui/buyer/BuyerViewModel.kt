@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.nass.data.local.SessionStore
 import com.example.nass.data.model.AddToCartResponse
 import com.example.nass.data.model.CartItem
 import com.example.nass.data.model.CheckoutResponse
@@ -12,7 +13,9 @@ import com.example.nass.data.model.Product
 import com.example.nass.data.model.TransactionSummary
 import com.example.nass.data.remote.RetrofitClient
 import com.example.nass.data.repository.CartRepository
+import com.example.nass.data.repository.FirestoreRepository
 import com.example.nass.data.repository.ProductRepository
+import com.example.nass.util.Logger
 import com.example.nass.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +24,8 @@ import kotlinx.coroutines.launch
 
 class BuyerViewModel(
     private val productRepo: ProductRepository,
-    private val cartRepo: CartRepository
+    private val cartRepo: CartRepository,
+    private val firestoreRepo: FirestoreRepository // <-- Added NoSQL Repo
 ) : ViewModel() {
 
     private val _available = MutableStateFlow<Resource<List<Product>>>(Resource.Idle)
@@ -45,6 +49,10 @@ class BuyerViewModel(
     private val _selectedProduct = MutableStateFlow<Product?>(null)
     val selectedProduct: StateFlow<Product?> = _selectedProduct.asStateFlow()
 
+    // --- Firestore Favorites State ---
+    private val _favorites = MutableStateFlow<Set<Int>>(emptySet())
+    val favorites: StateFlow<Set<Int>> = _favorites.asStateFlow()
+
     init {
         loadAvailable()
         loadCart()
@@ -56,6 +64,40 @@ class BuyerViewModel(
         viewModelScope.launch {
             _available.value = Resource.Loading
             _available.value = productRepo.getAvailable()
+        }
+    }
+
+    // ============ Firestore Favorites ============
+
+    fun loadFavorites(context: Context) {
+        viewModelScope.launch {
+            val userId = SessionStore.from(context).currentUserId()?.toString() ?: return@launch
+            when (val result = firestoreRepo.getFavorites(userId)) {
+                is Resource.Success -> _favorites.value = result.data.toSet()
+                is Resource.Error -> Logger.e("BuyerVM", result.message)
+                else -> Unit
+            }
+        }
+    }
+
+    fun toggleFavorite(context: Context, productId: Int) {
+        viewModelScope.launch {
+            val userId = SessionStore.from(context).currentUserId()?.toString() ?: return@launch
+            val isCurrentlyFav = _favorites.value.contains(productId)
+
+            // 1. Optimistic UI update (instant heart toggle)
+            _favorites.value = if (isCurrentlyFav) {
+                _favorites.value - productId
+            } else {
+                _favorites.value + productId
+            }
+
+            // 2. Save to NoSQL DB
+            if (isCurrentlyFav) {
+                firestoreRepo.removeFavorite(userId, productId)
+            } else {
+                firestoreRepo.addFavorite(userId, productId)
+            }
         }
     }
 
@@ -100,7 +142,7 @@ class BuyerViewModel(
             if (result is Resource.Success) {
                 loadCart()
                 loadAvailable()
-                loadHistory()   // refresh history so the new purchase shows immediately
+                loadHistory()
             }
         }
     }
@@ -127,7 +169,8 @@ class BuyerViewModel(
                 val api = RetrofitClient.getInstance(context)
                 BuyerViewModel(
                     productRepo = ProductRepository(api),
-                    cartRepo = CartRepository(api)
+                    cartRepo = CartRepository(api),
+                    firestoreRepo = FirestoreRepository() // <-- Initialized
                 )
             }
         }

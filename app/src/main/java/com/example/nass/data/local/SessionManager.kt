@@ -11,6 +11,8 @@ interface SessionManager {
     val roleFlow: Flow<String?>
     val usernameFlow: Flow<String?>
 
+    val userIdFlow: Flow<Int?>
+
     suspend fun saveSession(
         token: String,
         userId: Int,

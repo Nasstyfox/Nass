@@ -4,15 +4,17 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.ksp)
 }
 
-// Load signing config from keystore.properties if it exists
-val keystorePropsFile = rootProject.file("keystore.properties")
-val keystoreProps = Properties().apply {
-    if (keystorePropsFile.exists()) {
-        load(keystorePropsFile.inputStream())
-    }
-}
+        // Load signing config from keystore.properties if it exists
+        val keystorePropsFile = rootProject.file("keystore.properties")
+        val keystoreProps = Properties().apply {
+            if (keystorePropsFile.exists()) {
+                load(keystorePropsFile.inputStream())
+            }
+        }
 
 android {
     namespace = "com.example.nass"
@@ -111,4 +113,16 @@ dependencies {
 
     //Support for multi-language
     implementation(libs.androidx.appcompat)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.messaging)
+    implementation(libs.play.services.auth)
+
+    //RoomDB
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 }

@@ -14,6 +14,7 @@ class SessionStore(private val session: SessionManager) {
     suspend fun currentUsername(): String? = session.usernameFlow.first()
     suspend fun clearSession() = session.clearSession()
 
+    suspend fun currentUserId(): Int? = session.userIdFlow.first()
     companion object {
         fun from(context: Context) = SessionStore(TokenManager(context.applicationContext))
     }

@@ -182,4 +182,6 @@
     <string name="admin_reset_hint">Okungenani izinhlamvu eziyisi-6.</string>
     <string name="admin_btn_reset">Setha kabusha</string>
 
+    <string name="login_google">Ngena ngemvume nge-Google</string>
+
 </resources>

@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.nass.R
+import com.example.nass.data.local.TokenManager
 import com.example.nass.data.model.ProfileUser
 import com.example.nass.data.remote.RetrofitClient
 import com.example.nass.data.repository.ProfileRepository
@@ -54,7 +56,25 @@ class SettingsViewModel(private val repo: ProfileRepository) : ViewModel() {
     private val _busy = MutableStateFlow(false)
     val busy: StateFlow<Boolean> = _busy.asStateFlow()
 
+    private val _roleUpdateState = MutableStateFlow<Resource<Boolean>>(Resource.Idle)
+    val roleUpdateState: StateFlow<Resource<Boolean>> = _roleUpdateState.asStateFlow()
+
     init { loadProfile() }
+
+    fun becomeSeller() {
+        viewModelScope.launch {
+            _busy.value = true
+            when (val result = repo.updateRole("seller")) {
+                is Resource.Success -> {
+                    _actionMessage.value = "You are now a Seller! Please log in again."
+                    _roleUpdateState.value = Resource.Success(true)
+                }
+                is Resource.Error -> _actionMessage.value = result.message
+                else -> Unit
+            }
+            _busy.value = false
+        }
+    }
 
     fun loadProfile() {
         viewModelScope.launch {
@@ -96,7 +116,8 @@ class SettingsViewModel(private val repo: ProfileRepository) : ViewModel() {
         fun factory(context: Context) = viewModelFactory {
             initializer {
                 val api = RetrofitClient.getInstance(context)
-                SettingsViewModel(ProfileRepository(api))
+                val session = TokenManager(context.applicationContext)
+                SettingsViewModel(ProfileRepository(api, session))
             }
         }
     }
@@ -118,6 +139,7 @@ fun SettingsScreen(
     val profileState by vm.profile.collectAsState()
     val busy by vm.busy.collectAsState()
     val message by vm.actionMessage.collectAsState()
+    val roleUpdateState by vm.roleUpdateState.collectAsState()
 
     var displayName by remember { mutableStateOf("") }
     var showPasswordDialog by remember { mutableStateOf(false) }
@@ -135,6 +157,13 @@ fun SettingsScreen(
         message?.let {
             onMessage(it)
             vm.clearMessage()
+        }
+    }
+
+    // Handle successful role update -> Force logout to re-route
+    LaunchedEffect(roleUpdateState) {
+        if (roleUpdateState is Resource.Success) {
+            onLogout() // This kicks them back to the login screen to enter as a Seller
         }
     }
 
@@ -208,6 +237,7 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(8.dp))
 
+        // ---- Role Badge ----
         Surface(
             color = MaterialTheme.colorScheme.primaryContainer,
             shape = MaterialTheme.shapes.small,
@@ -220,6 +250,20 @@ fun SettingsScreen(
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
             )
+        }
+
+        // ---- Become a Seller Button (Only shows if user is a buyer) ----
+        if (user.role == "buyer") {
+            Spacer(Modifier.height(16.dp))
+            Button(
+                onClick = { vm.becomeSeller() },
+                enabled = !busy,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.Storefront, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Become a Seller")
+            }
         }
 
         Spacer(Modifier.height(24.dp))
@@ -240,7 +284,7 @@ fun SettingsScreen(
                 selected = currentLocale.startsWith("en"),
                 onClick = {
                     AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
-                    activity?.recreate() // Forces the screen to refresh instantly
+                    activity?.recreate()
                 },
                 label = { Text("English") }
             )
@@ -261,7 +305,10 @@ fun SettingsScreen(
                 label = { Text("isiZulu") }
             )
         }
-        // ==========================================
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(20.dp))
 
         // ---- Display Name ----
         Text(stringResource(R.string.display_name), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
