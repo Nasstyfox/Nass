@@ -1,72 +1,44 @@
 # Release Notes
 
-## v1.0 — Final PoE Release
+## v2.0 — Final PoE Release (Part 3)
 
-**Released:** 16 September 2026
+**Released:** 22 October 2026
 
-This is the final submission build for the OPSC6312 Portfolio of Evidence.
-It builds on the Part 2 prototype with the following additions and improvements.
+This is the final submission build for the OPSC6312 Portfolio of Evidence (Part 3).
+It builds on the Part 2 prototype with the following major innovative features.
 
-### Added Since Prototype (Part 2 → Final)
+### Added Since Part 2
 
-#### Buyer Flow (new)
-- Browse grid of all available items with seller attribution
-- Product detail sheet with Coil image loading
-- Shopping cart with badge counter, per-item removal, and live total
-- Checkout wrapped in an atomic MySQL transaction with double-sell protection
-- Purchase history — grouped, expandable per-transaction view
+#### 1. Single Sign-On (SSO)
+- Users can now register and log in using their Google accounts.
+- Google ID tokens are verified on the Node.js backend, and users are automatically created in the MySQL database with a default 'buyer' role.
+- Existing buyers can upgrade their role to 'seller' directly from the Settings screen.
 
-#### Admin Flow (new)
-- User list with All / Pending / Active / Suspended filter chips
-- One-tap user verification
-- Role management (buyer / seller / admin)
-- Password reset for any user
-- User deletion with self-delete protection
+#### 2. NoSQL Database (Cloud Firestore)
+- Implemented a real-time "Wishlist/Favorites" feature.
+- Buyers can tap the heart icon on any product to save it to Firebase Firestore (NoSQL).
+- Favorites persist across app restarts and are synced immediately.
 
-#### Shared Settings (new)
-- Display name editing
-- Change password with current-password verification
-- Proper logout that clears the DataStore session
+#### 3. Real-Time Push Notifications (Firebase Cloud Messaging)
+- Sellers now receive an instant push notification on their physical device when a buyer purchases one of their listed items.
+- FCM tokens are stored in the MySQL database during login.
+- The Node.js backend triggers notifications via Firebase Admin SDK during the checkout transaction.
 
-#### Infrastructure
-- **Unit tests** — 15 tests across repositories, ViewModels, and formatters
-- **GitHub Actions CI** — builds the debug APK and runs all unit tests on push
-- **Signed release APK** — production-ready with adaptive app icon
-- **Structured logging** via `Logger` wrapper (tagged `Nass.*` in Logcat)
+#### 4. Offline Mode with Sync (RoomDB)
+- Implemented local caching using Android Room Database.
+- If the device loses internet connection, the app seamlessly falls back to displaying cached products and cart items.
+- A visual "Offline Mode" banner appears on the Browse screen to notify the user.
+- Once the connection is restored, the app automatically syncs and overwrites the local cache with the latest API data.
 
-### Changed
-- All prices now formatted consistently via `Formatters.price()` (e.g. `R 349.99`)
-- Session storage abstracted behind `SessionManager` interface for testability
-- `AuthInterceptor` now reads from `SessionManager` instead of concrete
-  `TokenManager`
+#### 5. Multi-Language Support
+- The entire UI is now fully localizable.
+- Added support for English (Default), Afrikaans (af), and isiZulu (zu).
+- Users can switch languages dynamically from the Settings screen without restarting their phone.
 
-### Fixed
-- Logout no longer leaves a stale JWT in DataStore (previously required app
-  reinstall to log out fully)
-- Sold items can no longer be opened for edit — snackbar explains why
-- `AuthRepository` duplicate constructor parameter removed
+### Security & Infrastructure
+- Migrated backend to use `firebase-admin` for secure server-to-server FCM communication.
+- Added RoomDB migrations for local data integrity.
+- Extended the MySQL `users` table to store `fcm_token`.
 
-### Known Issues (deferred to post-PoE work)
-
-The following POE Part 3 requirements are not yet implemented and will be added
-in the next iteration:
-
-- Single Sign-On (SSO) via Google / Facebook
-- Offline mode with sync (Room / SQLite)
-- Real-time push notifications (Firebase Cloud Messaging)
-- Multi-language support (English + at least one additional SA language)
-- In-app image upload (currently images are added via URL)
-
-### Security
-- Passwords hashed with bcrypt (10 rounds) on the backend
-- JWT with 7-day expiry, verified on every protected request
-- Role-based access enforced on both frontend (routing) and backend
-  (middleware)
-- Release keystore excluded from version control
-
-### Technical
-- **Package:** `com.example.nass`
-- **Version:** `1.0` (versionCode `1`)
-- **Min SDK:** 26 (Android 8.0)
-- **Target SDK:** 35 (Android 15)
-- **APK size:** ~11.8 MB
+### Known Limitations
+- Offline mode currently caches the Browse and Cart views; checkout requires an active internet connection.

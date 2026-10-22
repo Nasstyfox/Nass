@@ -326,7 +326,13 @@ Every AI-generated code snippet was:
 3. Tested against the live backend and physical device
 4. Committed with descriptive messages in GitHub
 
-No code was committed that I could not explain line-by-line in a code review.
+### Part 3 Innovations (New)
+- **Single Sign-On (SSO):** Log in with Google via Firebase Auth.
+- **NoSQL Database:** Favorites/Wishlist powered by Firebase Firestore.
+- **Push Notifications:** Real-time FCM alerts sent to sellers when an item is purchased.
+- **Offline Mode:** RoomDB caching allows offline browsing and cart viewing, with an offline indicator banner.
+- **Multi-Language:** Fully translated UI in English, Afrikaans, and isiZulu.
+- **Cloud Storage:** Images uploaded from the phone gallery via Cloudinary.
 
 ---
 

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "322786386187",
+    "project_id": "nass-2b930",
+    "storage_bucket": "nass-2b930.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:322786386187:android:9760b33945d61659bac20e",
+        "android_client_info": {
+          "package_name": "com.example.nass"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322786386187-avv5re6b6m1idf0k7fnn5cluhki8q7ps.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nass",
+            "certificate_hash": "ccf866a1989464fcc9c25d1ec0ef7dd75af5dc03"
+          }
+        },
+        {
+          "client_id": "322786386187-l7qh5pv4ihmfq0lne1c0huksf912kqlo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBO9CfX7OyJu3V3ccI99Q-QV33bhTfDKAs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "322786386187-l7qh5pv4ihmfq0lne1c0huksf912kqlo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
