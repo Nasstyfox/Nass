@@ -5,7 +5,7 @@
 ![License](https://img.shields.io/badge/license-academic-lightgrey)
 
 An Android marketplace for buying and selling second-hand clothing. Built for
-the OPSC6312 Portfolio of Evidence (Part 2 — Prototype) at The Independent
+the OPSC6312 Portfolio of Evidence at The Independent
 Institute of Education.
 
 ---
@@ -252,7 +252,7 @@ app/src/main/java/com/example/nass/
 ## Demo Video
 
 
-[//ST10070515_OPSC6312_PART2_DEMO](https://youtu.be/4fyQjf3gT80)
+[//ST10070515_OPSC6312_PART3_DEMO](https://youtu.be/4fyQjf3gT80)
 
 
 ## AI Tool Usage
