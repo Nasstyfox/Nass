@@ -252,7 +252,7 @@ app/src/main/java/com/example/nass/
 ## Demo Video
 
 
-[//ST10070515_OPSC6312_PART2_DEMO](https://youtu.be/OffGekhINTo)
+[//ST10070515_OPSC6312_PART2_DEMO](https://youtu.be/4fyQjf3gT80)
 
 
 ## AI Tool Usage
